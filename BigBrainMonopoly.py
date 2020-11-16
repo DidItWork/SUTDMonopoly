@@ -111,6 +111,8 @@ class tile():
 #-------------------------------------------------------------------------#
 
 # Why we have the whole tiles.append() thing for ah lol
+# To store the gameboard like a list i guess
+# Then advancing tiles is just iterating over the list
 
 for i in range(num_of_tiles):
     if i == 0:
@@ -132,8 +134,9 @@ for i in range(num_players):
     players.append(player())
 
 for i in range(num_players):
-    name = input(f"Enter Player{i}'s name")
-    name = player()
+    name = input(f"Enter Player{i+1}'s name") # so players 1, 2, 3, 4, 5
+    # name = player() doesn't this just assign a new player() object to name, overriding the name you input anyway?
+    players.append(name, player()) # we could do this instead, or assign a name variable to the player object's initialisation
 
 #game functions
 #-------------------------------------------------------------------------#
@@ -174,11 +177,11 @@ def gameround(player_id, board):
     
 
 def game(num_players, bankruptcy, board):
-    
+    counter = 0 # otherwise counter keeps resetting to 0
     #Run the game rounds repeatedly until someone wins, if the player is bankrupt, skip the player
     while bankruptcy<num_players-1:
-        counter = 0
-        if player[counter].get_status() == "normal":
+        
+        if players[counter][1].get_status() == "normal": # iff. we implement "players" as a list of tuples as i suggested above
             board = gameround(counter, board)
         
         
