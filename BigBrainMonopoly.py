@@ -113,9 +113,9 @@ class building():
     
         return self.cost[self.level]*1.5
 
-    def set_level(self,level):
+    def level_up(self):
         
-        self.level = level
+        self.level +=1
     
     def set_ownership(self,player_id):
         
@@ -189,34 +189,48 @@ def gameround(player_id, board):
     dice1 = None
     dice2 = None
     step = 0
+    player = players[player_id][1]
     
     #Player with player_id plays this round
-    print("It's %s 's turn." % (players[player_id].get_name()))
+    print("It's %s 's turn." % (player.get_name()))
 
         
         
-    while True:
+    while dice1==dice2:
+        
+        
         buy = "z"
         strength = 0
+        
+        
         while strength < 1 or strength >5:
             strength = int(input("Roll Strength (1-5): "))
         dice1, dice2 = roll(strength)
-        print(dice1,dice2)
+        print("Roll 1:", dice1, "Roll 2:", dice2)
         step = dice1+dice2
-        players[player_id].update_position(step)
-        player_pos = players[player_id].get_position()
-        print(players[player_id].get_position())
+        player.update_position(step)
+        player_pos = player.get_position()
+        print("Player posiiton:",player.get_position())
         
         if tiles[player_pos].get_type()=="building" and tiles[player_pos].get_building().get_owner()==None:
             while buy[0] not in "yYnN":
                 
                 buy = input(("Do you want to buy %s [y/n]? " % (tiles[player_pos].get_building().get_name())))
                 
-                if buy[0] in "yY" and players[player_id].get_sanity()>=tiles[player_pos].get_building().get_cost():
+                if buy[0] in "yY" and player.get_sanity()>=tiles[player_pos].get_building().get_cost():
                     tiles[player_pos].get_building().set_ownership(player_id)
-                    players[player_id].update_sanity(-tiles[player_pos].get_building().get_cost())
+                    tiles[player_pos].get_building().level_up()
+                    player.update_sanity(-tiles[player_pos].get_building().get_cost())
                 
-        print(tiles[player_pos].get_building().get_owner())
+            print("Building owned by:",tiles[player_pos].get_building().get_owner())
+        
+        elif tiles[player_pos].get_building().get_owner() != None:
+            
+            #Implement rent payment
+            print("Rent time")
+            pass
+
+
         new_board = update_board(board)
         display_board(new_board)
     wait = input("Waiting...")
@@ -233,7 +247,7 @@ def game(num_players, bankruptcy, board):
         
     for i in range(1, num_players+1):
         name = input(f"Enter Player {i}'s name: ")
-        players.append(name, player())
+        players.append((name, player(name)))
     
     #Initialising variables
     #-------------------------------------------------------------------------#
@@ -256,8 +270,8 @@ def game(num_players, bankruptcy, board):
     counter = 0
     #Run the game rounds repeatedly until someone wins, if the player is bankrupt, skip the player
     while bankruptcy<num_players-1:
-         if players[counter][1].get_status() == "normal":
-            board = gameround(counter, board)
+        if players[counter][1].get_status() == "normal":
+           board = gameround(counter, board)
         
         
         #Cycling between players
