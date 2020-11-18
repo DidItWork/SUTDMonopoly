@@ -165,10 +165,11 @@ class tile():
 def roll(strength):
     
     #return a tuple of two integers (1-6) from dice rolls
-    #implement strength of roll
+    #implement strength of roll 
     
-    dice1 = random.randint(1, 6)
-    dice2 = random.randint(1, 6)
+    for i in (0,strength):
+        dice1 = random.randint(1, 6)
+        dice2 = random.randint(1, 6)
     
     return dice1, dice2
 
@@ -193,6 +194,8 @@ def display_board(board):
 
 def home(player_id):
     
+    players[player_id].update_sanity(200)
+    
     # Add <insert number> sanity points for players[player_id], return nothing
     # Hint use the .update_sanity(<insert number>) method for the player object
     
@@ -200,12 +203,19 @@ def home(player_id):
 
 def jail():
     
+    players[player_id].update_status("jail")
+    players[player_id].teleport() #add tile position of jail
+    
     # Change players[player_id]'s status to "jail" and players[player_id]'s position to <insert jail position>, return nothing
     # Hint: use the .update_status(<string>) to change the player's status,
     # use .teleport(<integer>) to change the player's position
     pass
 
-def tax():
+def tax(tax_pos):
+    
+    p = players[player_id].get_position()
+    val = tax_pos[p]
+    players[player_id].update_sanity(val)
     
     # Subtract <insert number> sanity points from players[player_id], return nothing
     # Hint use the .update_sanity(-<insert number>) method for the player object
@@ -215,7 +225,7 @@ def tax():
 def chance():
     
     # Randomly choose a card from chance and return it to the player
-    # Hint use random.choice(<iterable>)
+    # Hint use random.choice(<iterable)
     
     pass
 
