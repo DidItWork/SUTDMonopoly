@@ -34,9 +34,11 @@ tiles = []
 players = []
 names = []
 
+pass_go = 200
+
 building_pos = list(range(4))
 building_names = ["a","b","c","d"]
-building_cost = [[500,200,300],[500,200,300],[500,200,300],[500,200,300]]
+building_cost = [[100,200,300],[100,200,300],[100,200,300],[100,200,300]]
 chance_pos = []
 jail_pos = []
 tax_pos = {}
@@ -165,17 +167,19 @@ class tile():
 def roll(strength):
     
     #return a tuple of two integers (1-6) from dice rolls
-    #implement strength of roll 
     
-    for i in (0,strength):
-        dice1 = random.randint(1, 6)
-        dice2 = random.randint(1, 6)
+    # Strength is just a pseudo code to give the illusion of choice to the user
+    
+    dice1 = random.randint(1, 6)
+    dice2 = random.randint(1, 6)
     
     return dice1, dice2
 
 def update_board(board):
     
     #return an updated board from the old board
+    
+    # Tim will do this
     
     print("Printing board")
     
@@ -187,6 +191,8 @@ def display_board(board):
     # probably use some print function to do so
     #display board
     
+    # Tim will do this
+    
     print("Display board")
     
     pass
@@ -194,28 +200,25 @@ def display_board(board):
 
 def home(player_id):
     
-    players[player_id].update_sanity(200)
+    # pass_go as a global variable in case we wanted to add it somewhere else too
     
-    # Add <insert number> sanity points for players[player_id], return nothing
-    # Hint use the .update_sanity(<insert number>) method for the player object
-    
+    players[player_id].update_sanity(pass_go)    
     pass
 
-def jail():
+def jail(player_id):
     
     players[player_id].update_status("jail")
-    players[player_id].teleport() #add tile position of jail
+    players[player_id].teleport(jail_pos) #add tile position of jail
     
     # Change players[player_id]'s status to "jail" and players[player_id]'s position to <insert jail position>, return nothing
     # Hint: use the .update_status(<string>) to change the player's status,
     # use .teleport(<integer>) to change the player's position
     pass
 
-def tax(tax_pos):
-    
-    p = players[player_id].get_position()
-    val = tax_pos[p]
-    players[player_id].update_sanity(val)
+def tax(player_pos,player_id):
+
+    val = tax_pos[player_pos]
+    players[player_id].update_sanity(-val)
     
     # Subtract <insert number> sanity points from players[player_id], return nothing
     # Hint use the .update_sanity(-<insert number>) method for the player object
@@ -227,6 +230,8 @@ def chance():
     # Randomly choose a card from chance and return it to the player
     # Hint use random.choice(<iterable)
     
+    # Wang Zhao
+    
     pass
 
 
@@ -235,19 +240,75 @@ def pay_rent(from_player, to_player, amount):
     print("Payer %s : " % names[from_player], players[from_player].get_sanity())
     print("Landlord %s : " % names[to_player], players[to_player].get_sanity())
     
-    players[from_player].update_sanity(-amount)
-    players[to_player].update_sanity(amount)
     
+    if int(players[from_player].get_sanity()) < amount:
+        leftovers = int(players[from_player].get_sanity())
+        
+        players[to_player].update_sanity(leftovers)
+        players[from_player].update_sanity(-leftovers)
+        
+        amount -= leftovers
+        
+    else:
+        
+        players[from_player].update_sanity(-amount)
+        players[to_player].update_sanity(amount)
+        
     print(amount, -amount)
     print("Payer %s : " % names[from_player], players[from_player].get_sanity())
     print("Landlord %s : " % names[to_player], players[to_player].get_sanity())
     
-    if players[from_player].get_sanity()<0:
-        print("Oh no, you have lost your sanity\n Please choose a property to sell: ")
+    if players[from_player].get_sanity() == 0:
+        
+        sell = 0
+        sell_building = []
+        owned_building = []
+        sell_cost = 0
+        total_cost = 0
+        
         for i in building_pos:
-            if tiles[i].get_building().get_owner()==from_player:
-                print(tiles[i].get_building().get_name(), tiles[i].get_building().get_cost())
-    
+            if tiles[i].get_building().get_owner() == from_player:
+                owned_building.append(i)
+                owned_building.append(tiles[i].get_building().get_name())
+                owned_building.append(tiles[i].get_building().get_cost())
+                
+                sell_building.append(owned_building[:])
+                
+                owned_building = []
+                
+                total_cost += tiles[i].get_building().get_cost()
+                
+        if len(sell_building) == 0:
+            print("bAnKrUpT g3t g00d n00b")
+            players[from_player].update_status("Bankrupt")
+        elif total_cost < amount:
+            for i in range(len(sell_building)):
+                tiles[sell_building[i][0]].get_building().set_ownership(to_player)
+                
+            print("bAnKrUpT g3t g00d n00b")
+            players[from_player].update_status("Bankrupt")
+            
+        else:
+            while amount > 0:
+                print("Index", "Name", "Value")
+                for index, value in enumerate(sell_building):
+                    print(index + 1, value[1], value[2])
+              
+                while sell < 1 or sell > len(sell_building) + 1:
+                    sell = int(input("Choose building index to sell 1 to %s: " % len(sell_building)))
+                
+                sell -= 1
+                
+                amount -= sell_building[sell][2]
+                tiles[sell_building[sell][0]].get_building().set_ownership(to_player)
+                print(tiles[sell_building[sell][0]].get_building().get_owner())
+                
+                sell_building.pop(sell)
+                
+                if len(sell_building) == 0:
+                    print("bAnKrUpT g3t g00d n00b")
+                    players[from_player].update_status("Bankrupt")
+                    return
 
 def gameround(player_id, board):
     dice1 = None
@@ -262,6 +323,7 @@ def gameround(player_id, board):
         
     while dice1==dice2:
         
+        #check if player goes bankrupt
         
         buy = "z"
         strength = 0
@@ -275,7 +337,7 @@ def gameround(player_id, board):
         step = dice1+dice2
         player.update_position(step)
         player_pos = player.get_position()
-        print("Player posiiton:",player.get_position())
+        print("Player position:",player.get_position())
         
         if tiles[player_pos].get_type()=="building":
             if tiles[player_pos].get_building().get_owner()==None and tiles[player_pos].get_building().get_cost()<=player.get_sanity():
@@ -286,7 +348,7 @@ def gameround(player_id, board):
                     tiles[player_pos].get_building().set_ownership(player_id)
                     player.update_sanity(-tiles[player_pos].get_building().get_cost())
                     print(player.get_sanity())
-                print("Building owned by:",names[tiles[player_pos].get_building().get_owner()])
+                    print("Building owned by:",names[tiles[player_pos].get_building().get_owner()])
             
             elif tiles[player_pos].get_building().get_owner()!=None and tiles[player_pos].get_building().get_owner() != player_id:
                 
@@ -294,8 +356,9 @@ def gameround(player_id, board):
                 print("Rent time")
                 
                 pay_rent(player_id,tiles[player_pos].get_building().get_owner(), tiles[player_pos].get_building().get_rent())
+                if player.get_status() == "Bankrupt":
+                    break
                 
-                pass
             elif tiles[player_pos].get_building().get_owner()!=None and tiles[player_pos].get_building().get_owner() == player_id:
                 pass
             else:
@@ -307,11 +370,11 @@ def gameround(player_id, board):
         
         elif tiles[player_pos].get_type()=="tax":
             
-            tax()
+            tax(player_pos,player_id)
         
         elif tiles[player_pos].get_type()=="jail":
             
-            jail()
+            jail(player_id)
         
         elif tiles[player_pos].get_type()=="home":
             
