@@ -217,6 +217,7 @@ def chance():
     # Randomly choose a card from chance and return it to the player
     # Hint use random.choice(<iterable>)
     
+    #wz was here
     pass
 
 
