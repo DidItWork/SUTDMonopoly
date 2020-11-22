@@ -364,12 +364,13 @@ def gameround(player_id):
                 print("Rent time")
                 
                 pay_rent(player_id,active_building.get_owner(), active_building.get_rent())
+                print(active_building.get_rent())
                 if player.get_status() == "Bankrupt":
                     break
                 
             elif active_building.get_owner()!=None and active_building.get_owner() == player_id:
                 
-                if active_building.get_cost()>player.get_sanity():
+                if active_building.get_cost()>player.get_sanity() or active_building.get_level()>2:
                     pass
                 else:
                     while buy[0] not in "yYnN":
