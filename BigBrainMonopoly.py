@@ -258,6 +258,7 @@ def pay_rent(from_player, to_player, amount):
         
         players[from_player].update_sanity(-amount)
         players[to_player].update_sanity(amount)
+        amount = 0
         
     print(amount, -amount)
     print("Payer %s : " % names[from_player], players[from_player].get_sanity())
@@ -371,7 +372,7 @@ def gameround(player_id):
             elif active_building.get_owner()!=None and active_building.get_owner() == player_id:
                 
                 if active_building.get_cost()>player.get_sanity() or active_building.get_level()>2:
-                    pass
+                    print("Sorry, you do not have enough sanity to upgrade this building")
                 else:
                     while buy[0] not in "yYnN":
                         buy = input(("Do you want to upgrade %s to Level %s , cost: %s sanity [y/n]? " 
