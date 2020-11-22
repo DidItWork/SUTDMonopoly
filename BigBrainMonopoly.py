@@ -12,23 +12,21 @@ import random
 
 #Initialise parameters, building values is a list of lists
 #-------------------------------------------------------------------------#
+
 # tiles - list of tile objects making up the board
-# players - list of player objects
-# names - list of player names
-# bankruptcy - how many people are bankrupted
-
-
-#to be initialised, Jade
-
-# building_pos - position of the buildings on the respective tiles, 
+# building_pos - position of the buildings on the respective tiles
+# building_names - list of building names (strings)
+# building_colours - list of respective building colours
+# building_values - list of lists of the three building values of each respective building
+# go_pos - position of go tile
 # chance_pos - position of chance tiles
 # jail_pos - position of jail tiles
 # tax_pos - dictionary with tax tiles positions being the keys and the amount of the taxes being the values
-# cont. 0-39 anticlockwise starting from bottom left, i.e. GO is 0
-
-# building_names - list of building names (strings)
-# building_cost - list of lists of the cost at each of the 3 levels for each respective building
-# chance_names - a list of all the names of the chance cards, list of strings
+# players - list of player objects
+# names - list of player names
+# board - game board layout
+# bankruptcy - how many people are bankrupted
+# chance - a dictionary of all the chance cards, with the keys being the name of the cards and the values being the effect
 
 num_of_tiles = 4
 num_players = 0
@@ -36,16 +34,18 @@ bankruptcy = 0
 tiles = []
 players = []
 names = []
-pass_go = 200
 
+pass_go = 200
 
 building_pos = list(range(4))
 building_names = ["a","b","c","d"]
 building_cost = [[100,200,300],[100,200,300],[100,200,300],[100,200,300]]
+go_pos = []
 chance_pos = []
 jail_pos = []
 tax_pos = {}
-chance_names = []
+board = []
+chance = {}
 
 
 
@@ -135,17 +135,12 @@ class building():
         
         return self.name
     
-    def get_cost(self, *level):
-        if len(level) ==0:  
-            return self.cost[self.level]
-        else:
-            return self.cost[level[0]]
+    def get_cost(self):
         
+        return self.cost[self.level]
+    
     def get_owner(self):
         return self.owner
-    
-    def get_level(self):
-        return self.level
         
         
 class tile():
@@ -232,13 +227,36 @@ def tax(player_pos,player_id):
     
     pass
     
-def chance():
+def chance(player_pos, player_id):
+    # Need to add new def for freeze?
+    # Randomly choose a card from chance and return it to the player
+    # Hint use random.choice(<iterable)
     
-    # Randomly choose a card from chance and execute its effect
+    val = random.radin (0,400)
+    card_names = ["You were too lazy to wear your mask to the toilet and GOT CAUGHT!", "You attended fifth-row!", "You got an A for CTD Assignment!", "It's ice-cream day! You collected free ice-cream from student government!", "Yay! There's no zoom webinar for HASS this week! More sleep!", "You bought healthy soup and the uncle gave you free sides! Nomnom...", "It's finally the weekend!", "It's term-break! Finally some rest...", "Oh no! You are late for class!", "Crap! You forgot your laundary!", "Crap! You lost your room card!", "You failed Modelling and Analysis! :(", "You failed Physcial World! :(", "You failed your finals and you are now in bOOtCAMP! :(", "Oww... You bought mixed rice and got food poisoning."]
+    card_effects = [jail, update_sanity, update_sanity, freeze,]
+    temp_names = []
     
-    # Wang Zhao
+    choice = random.randin (0,len(card_names)-1)
+    print(card_names[choice])
     
-    pass
+    if choice = 0: 
+        card_effects[0](player_id)
+        
+    elif 0 < choice <= 7:
+        players[player_id].card_effects[1](+val)
+        print ("Congratualations! You have gained", val, "sanity.")
+        
+    else:
+        players[player_id].card_effects[2](-val)
+        print ("Aww man... You just lost", val, "sanity")
+   
+    
+    if len(card_names) == 0:
+        length = len(temp_names)
+        for i in range(length):
+            card_names.append(temp_names.pop())
+
 
 def pay_rent(from_player, to_player, amount):
     
@@ -258,7 +276,6 @@ def pay_rent(from_player, to_player, amount):
         
         players[from_player].update_sanity(-amount)
         players[to_player].update_sanity(amount)
-        amount = 0
         
     print(amount, -amount)
     print("Payer %s : " % names[from_player], players[from_player].get_sanity())
@@ -316,7 +333,7 @@ def pay_rent(from_player, to_player, amount):
                     players[from_player].update_status("Bankrupt")
                     return
 
-def gameround(player_id):
+def gameround(player_id, board):
     dice1 = None
     dice2 = None
     step = 0
@@ -346,45 +363,27 @@ def gameround(player_id):
         print("Player position:",player.get_position())
         
         if tiles[player_pos].get_type()=="building":
-            
-            active_building = tiles[player_pos].get_building()
-            
-            if active_building.get_owner()==None and active_building.get_cost()<=player.get_sanity():
+            if tiles[player_pos].get_building().get_owner()==None and tiles[player_pos].get_building().get_cost()<=player.get_sanity():
                 while buy[0] not in "yYnN":
-                    buy = input(("Do you want to buy %s, cost: %s sanity [y/n]? " % (active_building.get_name(), active_building.get_cost())))
+                    buy = input(("Do you want to buy %s [y/n]? " % (tiles[player_pos].get_building().get_name())))
                     
                 if buy[0] in "yY":
-                    active_building.set_ownership(player_id)
-                    player.update_sanity(-active_building.get_cost())
+                    tiles[player_pos].get_building().set_ownership(player_id)
+                    player.update_sanity(-tiles[player_pos].get_building().get_cost())
                     print(player.get_sanity())
-                    print("Building owned by:",names[active_building.get_owner()])
+                    print("Building owned by:",names[tiles[player_pos].get_building().get_owner()])
             
-            elif active_building.get_owner()!=None and active_building.get_owner() != player_id:
+            elif tiles[player_pos].get_building().get_owner()!=None and tiles[player_pos].get_building().get_owner() != player_id:
                 
                 #Implement rent payment
                 print("Rent time")
                 
-                pay_rent(player_id,active_building.get_owner(), active_building.get_rent())
-                print(active_building.get_rent())
+                pay_rent(player_id,tiles[player_pos].get_building().get_owner(), tiles[player_pos].get_building().get_rent())
                 if player.get_status() == "Bankrupt":
                     break
                 
-            elif active_building.get_owner()!=None and active_building.get_owner() == player_id:
-                
-                if active_building.get_cost()>player.get_sanity() or active_building.get_level()>2:
-                    print("Sorry, you do not have enough sanity to upgrade this building")
-                else:
-                    while buy[0] not in "yYnN":
-                        buy = input(("Do you want to upgrade %s to Level %s , cost: %s sanity [y/n]? " 
-                                     % (active_building.get_name(), 
-                                        active_building.get_level()+2, 
-                                        active_building.get_cost(active_building.get_level()+1))))
-                        
-                    if buy[0] in "yY":
-                        active_building.level_up()
-                        player.update_sanity(-active_building.get_cost())
-                        print(player.get_sanity())
-                        print("Building owned by:",names[active_building.get_owner()])
+            elif tiles[player_pos].get_building().get_owner()!=None and tiles[player_pos].get_building().get_owner() == player_id:
+                pass
             else:
                 print("Ha sorry you broke")
                 
@@ -408,15 +407,15 @@ def gameround(player_id):
             print("Some error occurred")
 
 
-        # new_board = update_board(board)
-        # display_board(new_board)
+        new_board = update_board(board)
+        display_board(new_board)
     wait = input("Waiting...")
     
-    # return board
+    return board
     pass
     
 
-def game(num_players, bankruptcy):
+def game(num_players, bankruptcy, board):
     
     #game initialisation
     while num_players < 2 or num_players > 5:
@@ -454,7 +453,7 @@ def game(num_players, bankruptcy):
     #Run the game rounds repeatedly until someone wins, if the player is bankrupt, skip the player
     while bankruptcy<num_players-1:
         if players[counter].get_status() == "normal":
-           gameround(counter)
+           board = gameround(counter, board)
         
         
         #Cycling between players
@@ -466,5 +465,5 @@ def game(num_players, bankruptcy):
     
 #Run the game
 
-game(num_players, bankruptcy)
+game(num_players, bankruptcy, board)
     
