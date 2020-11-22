@@ -136,8 +136,17 @@ class building():
         return self.name
     
     def get_cost(self, *level):
-        if len(level) ==0:  
-            return self.cost[self.level]
+        
+        cost = 0
+        
+        if len(level) == 0:  
+            if self.level == 0:
+                return self.cost[0]
+            else:
+                for i in range(self.level):
+                    cost += self.cost[i]
+                return cost
+        
         else:
             return self.cost[level[0]]
         
@@ -311,6 +320,9 @@ def pay_rent(from_player, to_player, amount):
                 
                 sell_building.pop(sell)
                 
+                if amount == 0:
+                    return
+                
                 if len(sell_building) == 0:
                     print("bAnKrUpT g3t g00d n00b")
                     players[from_player].update_status("Bankrupt")
@@ -467,4 +479,3 @@ def game(num_players, bankruptcy):
 #Run the game
 
 game(num_players, bankruptcy)
-    
