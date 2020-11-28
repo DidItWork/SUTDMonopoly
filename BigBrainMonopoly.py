@@ -17,9 +17,6 @@ import random
 # names - list of player names
 # bankruptcy - how many people are bankrupted
 
-
-#to be initialised, Jade
-
 # building_pos - position of the buildings on the respective tiles, 
 # chance_pos - position of chance tiles
 # jail_pos - position of jail tiles
@@ -37,7 +34,6 @@ tiles = []
 players = []
 names = []
 pass_go = 200
-
 
 building_pos = list(range(4))
 building_names = ["a","b","c","d"]
