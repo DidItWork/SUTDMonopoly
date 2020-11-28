@@ -174,6 +174,25 @@ class tile():
     def get_building(self):
         return self.building
     
+class card():
+	id_no = 0
+	
+    # Notice how it is *cost, the * indicates that cost is an optional argument
+	def __init__(self, name, effect, *cost):
+		self.id = self.id_no
+		self.name = name
+        
+        # Effect will be a tuple of objects
+		self.effect = effect, *cost
+
+		self.id_no += 1
+	
+	def get_name(self):
+		return self.name
+	
+	def get_effect(self):
+		return self.effect
+    
 #game functions
 #-------------------------------------------------------------------------#
 
@@ -251,11 +270,11 @@ def chance(player_pos, player_id):
     choice = random.randin (0,len(card_names)-1)
     print(card_names[choice])
     
-    if choice = 0:
+    if choice == 0:
         #Need to add new def for freeze help
         card_effects[0]()
     
-    elif choice = 1: 
+    elif choice == 1: 
         card_effects[1](player_id)
 
     elif 0 < choice <= 7:
@@ -450,7 +469,24 @@ def gameround(player_id):
     
     # return board
     pass
-    
+
+
+#Initialising variables
+#-------------------------------------------------------------------------#
+def render_game():
+    for i in range(num_of_tiles):
+        if i == 5000:
+            tiles.append(tile("home",""))
+        elif i in building_pos:
+            tiles.append(tile("building", building(building_names[i], building_cost[i])))
+        elif i in chance_pos:
+            tiles.append(tile("chance",""))
+        elif i in jail_pos:
+            tiles.append(tile("jail",""))
+        elif i in tax_pos:
+            tiles.append(tile("tax",""))
+        
+    # Render chance cards here
 
 def game(num_players, bankruptcy):
     
@@ -467,24 +503,9 @@ def game(num_players, bankruptcy):
                 break
             else:
                 print("Name already exist! Please Reenter name")
-    
+                
     #Initialising variables
-    #-------------------------------------------------------------------------#
-    
-    # Why we have the whole tiles.append() thing for ah lol
-    
-    for i in range(num_of_tiles):
-        if i == 5000:
-            tiles.append(tile("home",""))
-        elif i in building_pos:
-            tiles.append(tile("building", building(building_names[i], building_cost[i])))
-        elif i in chance_pos:
-            tiles.append(tile("chance",""))
-        elif i in jail_pos:
-            tiles.append(tile("jail",""))
-        elif i in tax_pos:
-            tiles.append(tile("tax",""))
-    print(tiles)
+    render_game()
         
     counter = 0
     #Run the game rounds repeatedly until someone wins, if the player is bankrupt, skip the player
@@ -494,13 +515,11 @@ def game(num_players, bankruptcy):
         
         
         #Cycling between players
-        
         counter += 1
         counter = counter%num_players
     
     pass
     
 #Run the game
-
 game(num_players, bankruptcy)
-    
+   
