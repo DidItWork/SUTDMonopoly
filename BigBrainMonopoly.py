@@ -5,7 +5,7 @@ Created on Mon Nov 16 17:54:30 2020
 @author: Benjamin Luo
 """
 
-import math
+import tkinter
 import random
 
 #Initialise parameters, building values is a list of lists
@@ -431,7 +431,7 @@ def gameround(player_id):
         elif tiles[player_pos].get_type()=="jail":
             jail(player_id)
         elif tiles[player_pos].get_type()=="home":
-            home()
+            home(player_id)
         else:
             print("Some error occurred.")
             
