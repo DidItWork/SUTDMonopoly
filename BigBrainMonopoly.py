@@ -8,8 +8,6 @@ Created on Mon Nov 16 17:54:30 2020
 import math
 import random
 
-
-
 #Initialise parameters, building values is a list of lists
 #-------------------------------------------------------------------------#
 # tiles - list of tile objects making up the board
@@ -43,11 +41,8 @@ jail_pos = []
 tax_pos = {}
 chance_names = []
 
-
-#Defining classes of objects
+# Defining classes of objects
 #-------------------------------------------------------------------------#
-
-
 class player():
     
     # for functions on setting variables and getting variable values, use getters and setter
@@ -90,9 +85,7 @@ class player():
     
     def update_sanity(self,sanity):
         self.__sanity += sanity
-    
-    
-        
+
 class building():
     
     # Don't need colour cause can't present colours anyways
@@ -147,7 +140,6 @@ class building():
     def get_level(self):
         return self.__level
         
-        
 class tile():
     
     id_no = 0
@@ -187,10 +179,25 @@ class card():
 	def get_effect(self):
 		return self.__effect
     
-#game functions
+# Initialising variables
 #-------------------------------------------------------------------------#
-
-def roll(strength):
+def render_game():
+    for i in range(num_of_tiles):
+        if i == 5000:
+            tiles.append(tile("home",""))
+        elif i in building_pos:
+            tiles.append(tile("building", building(building_names[i], building_cost[i])))
+        elif i in chance_pos:
+            tiles.append(tile("chance",""))
+        elif i in jail_pos:
+            tiles.append(tile("jail",""))
+        elif i in tax_pos:
+            tiles.append(tile("tax",""))
+    # Render chance card under here
+    
+# Game functions
+#-------------------------------------------------------------------------#
+def roll():
     
     #return a tuple of two integers (1-6) from dice rolls
     
@@ -201,54 +208,19 @@ def roll(strength):
     
     return dice1, dice2
 
-def update_board(board):
-    
-    #return an updated board from the old board
-    
-    # Tim will do this
-    
-    print("Printing board")
-    
-    pass
-
-
-def display_board(board):
-    
-    # probably use some print function to do so
-    #display board
-    
-    # Tim will do this
-    
-    print("Display board")
-    
-    pass
-
-
 def home(player_id):
-    
     # pass_go as a global variable in case we wanted to add it somewhere else too
-    
     players[player_id].update_sanity(pass_go)    
     pass
 
 def jail(player_id):
-    
     players[player_id].update_status("jail")
-    players[player_id].teleport(jail_pos) #add tile position of jail
-    
-    # Change players[player_id]'s status to "jail" and players[player_id]'s position to <insert jail position>, return nothing
-    # Hint: use the .update_status(<string>) to change the player's status,
-    # use .teleport(<integer>) to change the player's position
+    players[player_id].teleport(jail_pos)
     pass
 
 def tax(player_pos,player_id):
-
     val = tax_pos[player_pos]
     players[player_id].update_sanity(-val)
-    
-    # Subtract <insert number> sanity points from players[player_id], return nothing
-    # Hint use the .update_sanity(-<insert number>) method for the player object
-    
     pass
     
 def chance(player_pos, player_id):
@@ -257,7 +229,24 @@ def chance(player_pos, player_id):
     # Randomly choose a card from chance and return it to the player
     
     val = random.radin (0,200)
-    card_names = ["You were too lazy to wear your mask to the toilet and GOT CAUGHT!", "You gamed all night yesterday and fell asleep during Physics :(""You attended fifth-row!", "You got an A for CTD Assignment!", "It's ice-cream day! You collected free ice-cream from student government!", "Yay! There's no zoom webinar for HASS this week! More sleep!", "You bought healthy soup and the uncle gave you free sides! Nomnom...", "It's finally the weekend!", "It's term-break! Finally some rest...", "Oh no! You are late for class!", "Crap! You forgot your laundary!", "Crap! You lost your room card!", "You failed Modelling and Analysis! :(", "You failed Physcial World! :(", "You failed your finals and you are now in bOOtCAMP! :(", "Oww... You bought mixed rice and got food poisoning.", "Oh no! You forgot to bring your charger to class and your laptop is dying!"]
+    card_names = ["You were too lazy to wear your mask to the toilet and GOT CAUGHT!", 
+                  "You gamed all night yesterday and fell asleep during Physics :(",
+                  "You attended fifth-row!", 
+                  "You got an A for CTD Assignment!", 
+                  "It's ice-cream day! You collected free ice-cream from student government!", 
+                  "Yay! There's no zoom webinar for HASS this week! More sleep!", 
+                  "You bought healthy soup and the uncle gave you free sides! Nomnom...", 
+                  "It's finally the weekend!", 
+                  "It's term-break! Finally some rest...", 
+                  "Oh no! You are late for class!", 
+                  "Crap! You forgot your laundary!", 
+                  "Crap! You lost your room card!", 
+                  "You failed Modelling and Analysis! :(", 
+                  "You failed Physcial World! :(", 
+                  "You failed your finals and you are now in bOOtCAMP! :(", 
+                  "Oww... You bought mixed rice and got food poisoning.", 
+                  "Oh no! You forgot to bring your charger to class and your laptop is dying!"]
+    
     card_effects = [freeze, jail, update_sanity]
     temp_names = []
     
@@ -315,7 +304,6 @@ def pay_rent(from_player, to_player, amount):
         sell = 0
         sell_building = []
         owned_building = []
-        sell_cost = 0
         total_cost = 0
         
         for i in building_pos:
@@ -364,7 +352,33 @@ def pay_rent(from_player, to_player, amount):
                     print("bAnKrUpT g3t g00d n00b")
                     players[from_player].update_status("Bankrupt")
                     return
+    pass
 
+# GUI/Board functions
+#-------------------------------------------------------------------------#
+def update_board(board):
+    
+    #return an updated board from the old board
+    
+    # Tim will do this
+    
+    print("Printing board")
+    
+    pass
+
+def display_board(board):
+    
+    # probably use some print function to do so
+    #display board
+    
+    # Tim will do this
+    
+    print("Display board")
+    
+    pass
+
+# Actual Game
+#-------------------------------------------------------------------------#
 def gameround(player_id):
     dice1 = None
     dice2 = None
@@ -381,12 +395,16 @@ def gameround(player_id):
         #check if player goes bankrupt
         
         buy = "z"
+        
+        """
         strength = 0
-        
-        
         while strength < 1 or strength >5:
             strength = int(input("Roll Strength (1-5): "))
-        dice1, dice2 = roll(strength)
+        """
+        
+        input("Press 'Enter' to roll.")
+        
+        dice1, dice2 = roll()
         print("Roll 1:", dice1)
         print("Roll 2:", dice2)
         step = dice1+dice2
@@ -459,29 +477,11 @@ def gameround(player_id):
 
         # new_board = update_board(board)
         # display_board(new_board)
-    wait = input("Waiting...")
     
     # return board
     pass
 
-
-#Initialising variables
-#-------------------------------------------------------------------------#
-def render_game():
-    for i in range(num_of_tiles):
-        if i == 5000:
-            tiles.append(tile("home",""))
-        elif i in building_pos:
-            tiles.append(tile("building", building(building_names[i], building_cost[i])))
-        elif i in chance_pos:
-            tiles.append(tile("chance",""))
-        elif i in jail_pos:
-            tiles.append(tile("jail",""))
-        elif i in tax_pos:
-            tiles.append(tile("tax",""))
-        
     # Render chance cards here
-
 def game(num_players, bankruptcy):
     
     #game initialisation
@@ -507,11 +507,9 @@ def game(num_players, bankruptcy):
         if players[counter].get_status() == "normal":
            gameround(counter)
         
-        
         #Cycling between players
         counter += 1
         counter = counter%num_players
-    
     pass
     
 #Run the game
