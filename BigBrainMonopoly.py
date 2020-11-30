@@ -31,6 +31,7 @@ tiles = []
 players = []
 names = []
 pass_go = 200
+cards = []
 
 building_pos = list(range(4))
 building_names = ["a","b","c","d"]
@@ -201,32 +202,6 @@ def tax(player_pos,player_id):
     pass
     
 def chance(player_id):
-
-    cards = []
-
-    cards.append(card("You got accepted for scholarship!", "update sanity", 50))
-    cards.append(card("You got an A for CTD Assignment!", "update sanity", 50))
-    cards.append(card("You got an A for HASS Assignment!", "update sanity", 50))
-    cards.append(card("You got an A for Physics Finals!", "update sanity", 50))
-    cards.append(card("You got an A for Math Finals!", "update sanity", 50))
-    cards.append(card("You passed Freshmore Term 1!", "update sanity", 30))
-    cards.append(card("You attended fifth-row!", "update sanity", 30))
-    cards.append(card("Yay! There's no zoom webinar for HASS this week! More sleep!", "update sanity", 10))
-    cards.append(card("It's term-break! Finally some rest...", "update sanity", 10))
-
-    cards.append(card("Oh no! You are late for class!", "update sanity", -10))
-    cards.append(card("You gamed all night yesterday and fell asleep during class!", "update sanity", -10))
-    cards.append(card("You became the hard carry of your group", "update sanity", -20))
-    cards.append(card("Crap! You forgot your laundry!", "update sanity", -20))
-    cards.append(card("You deleted Rhino after CTD, now you have to re-download it for 2D", "update sanity", -30))
-    cards.append(card("You lost your room card!", "update sanity", -30))
-
-    cards.append(card("It's ice-cream day! You collected free ice-cream from student government! Everyone gets 20 sanity", "sanity for all",20))
-    cards.append(card("It's your birthday! Receive 20 sanity from all players!", "birthday", "20"))
-    cards.append(card("You failed your finals and you are now in bOOtCAMP!", "lose a property"))    
-    cards.append(card("You were too lazy to wear your mask to the toilet and GOT CAUGHT! You are going to jail!", "go to jail"))
-    cards.append(card("You are now buying from mixed rice stall! Roll double in order to enjoy your meal!", "roll double", "50"))
-
     carded = list(range(0, len(cards)))
     # Wouldn't this line make it not possible to remove the card from deck permanently?
     # Everytime the chance() is executed this line would erase previous' carded list?
@@ -263,7 +238,7 @@ def chance(player_id):
         jail(player_id)
 
     elif cards[randomz].get_effect()[0] == "roll double":
-        #?????
+        # ????
         pass
 
     elif cards[randomz].get_effect()[0] == "lose a property":
@@ -529,6 +504,30 @@ def render_game():
             tiles.append(tile("jail",""))
         elif i in tax_pos:
             tiles.append(tile("tax",""))
+            
+    cards.append(card("You got accepted for scholarship!", "update sanity", 50))
+    cards.append(card("You got an A for CTD Assignment!", "update sanity", 50))
+    cards.append(card("You got an A for HASS Assignment!", "update sanity", 50))
+    cards.append(card("You got an A for Physics Finals!", "update sanity", 50))
+    cards.append(card("You got an A for Math Finals!", "update sanity", 50))
+    cards.append(card("You passed Freshmore Term 1!", "update sanity", 30))
+    cards.append(card("You attended fifth-row!", "update sanity", 30))
+    cards.append(card("Yay! There's no zoom webinar for HASS this week! More sleep!", "update sanity", 10))
+    cards.append(card("It's term-break! Finally some rest...", "update sanity", 10))
+
+    cards.append(card("Oh no! You are late for class!", "update sanity", -10))
+    cards.append(card("You gamed all night yesterday and fell asleep during class!", "update sanity", -10))
+    cards.append(card("You became the hard carry of your group", "update sanity", -20))
+    cards.append(card("Crap! You forgot your laundry!", "update sanity", -20))
+    cards.append(card("You deleted Rhino after CTD, now you have to re-download it for 2D", "update sanity", -30))
+    cards.append(card("You lost your room card!", "update sanity", -30))
+
+    cards.append(card("It's ice-cream day! You collected free ice-cream from student government! Everyone gets 20 sanity", "sanity for all",20))
+    cards.append(card("It's your birthday! Receive 20 sanity from all players!", "birthday", 20))
+    cards.append(card("You failed your finals and you are now in bOOtCAMP!", "lose a property"))    
+    cards.append(card("You were too lazy to wear your mask to the toilet and GOT CAUGHT! You are going to jail!", "go to jail"))
+    cards.append(card("You are now buying from mixed rice stall! Roll double in order to enjoy your meal!", "roll double", 50))
+
     # Render chance card under here
     
 # GUI/Board functions
