@@ -44,8 +44,6 @@ tax_pos = {}
 chance_names = []
 
 
-
-
 #Defining classes of objects
 #-------------------------------------------------------------------------#
 
@@ -56,42 +54,42 @@ class player():
     id_no = 0
     
     def __init__(self, name):
-        self.id = self.id_no
-        self.status = "normal"
-        self.position = 0
-        self.name = name
-        self.sanity = 500 
-        self.building = []
+        self.__id = self.id_no
+        self.__status = "normal"
+        self.__position = 0
+        self.__name = name
+        self.__sanity = 500 
+        self.__building = []
 
         
         self.id_no += 1
       
     
     def get_status(self):
-        return self.status
+        return self.__status
     
     def update_status(self,status):
         #normal, bankrupt, jailed, frozen
-        self.status = status
+        self.__status = status
     
     def get_position(self):
-        return self.position
+        return self.__position
     
     def update_position(self, position):
-        self.position += position
-        self.position = self.position%num_of_tiles
+        self.__position += position
+        self.__position = self.__position%num_of_tiles
     
     def teleport(self,position):
-        self.position = position
+        self.__position = position
     
     def get_name(self):
-        return self.name
+        return self.__name
     
     def get_sanity(self):
-        return self.sanity
+        return self.__sanity
     
     def update_sanity(self,sanity):
-        self.sanity += sanity
+        self.__sanity += sanity
     
     
         
@@ -107,47 +105,47 @@ class building():
         # being a list of three numbers with each number indicating its value at the
         # respective level
         
-        self.level = 0
-        self.owner = None
-        self.cost = cost #list of three integers indicating the costs of the building
-        self.name = name
+        self.__level = 0
+        self.__owner = None
+        self.__cost = cost #list of three integers indicating the costs of the building
+        self.__name = name
         
     
     def get_rent(self):
         
         # rent of building calculated from cost and level 
     
-        return self.cost[self.level]*1.5
+        return self.__cost[self.__level]*1.5
 
     def level_up(self):
         
-        self.level +=1
+        self.__level +=1
     
-    def set_ownership(self,player_id):
+    def set_ownership(self, player_id):
         
-        self.owner = player_id
+        self.__owner = player_id
 
     def get_name(self):
         
-        return self.name
+        return self.__name
     
     def get_cost(self, *level):
         
         cost = 0
         
         if len(level) == 0:  
-            if self.level == 0:
-                return self.cost[0]
+            if self.__level == 0:
+                return self.__cost[0]
             else:
-                for i in range(self.level):
-                    cost += self.cost[i]
+                for i in range(self.__level):
+                    cost += self.__cost[i]
                 return cost
         
     def get_owner(self):
-        return self.owner
+        return self.__owner
     
     def get_level(self):
-        return self.level
+        return self.__level
         
         
 class tile():
@@ -155,39 +153,39 @@ class tile():
     id_no = 0
     
     def __init__(self, tile_type, building):
-        self.id = self.id_no
+        self.__id = self.id_no
         self.id_no += 1
         
-        self.tile_type = tile_type
+        self.__tile_type = tile_type
         
-        if self.tile_type == "building":
+        if self.__tile_type == "building":
             print("ok")
-            self.building = building
+            self.__building = building
     
     def get_type(self):
-        return self.tile_type
+        return self.__tile_type
     
     def get_building(self):
-        return self.building
+        return self.__building
     
 class card():
 	id_no = 0
 	
     # Notice how it is *cost, the * indicates that cost is an optional argument
 	def __init__(self, name, effect, *cost):
-		self.id = self.id_no
-		self.name = name
+		self.__id = self.id_no
+		self.__name = name
         
         # Effect will be a tuple of objects
-		self.effect = effect, *cost
+		self.__effect = effect, *cost
 
 		self.id_no += 1
 	
 	def get_name(self):
-		return self.name
+		return self.__name
 	
 	def get_effect(self):
-		return self.effect
+		return self.__effect
     
 #game functions
 #-------------------------------------------------------------------------#
@@ -518,4 +516,3 @@ def game(num_players, bankruptcy):
     
 #Run the game
 game(num_players, bankruptcy)
-   
