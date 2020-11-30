@@ -223,57 +223,75 @@ def tax(player_pos,player_id):
     players[player_id].update_sanity(-val)
     pass
     
-def chance(player_pos, player_id):
+def chance(player_id):
     
-    # Need to add new def for freeze
-    # Randomly choose a card from chance and return it to the player
+    cards = []
     
-    val = random.radin (0,200)
-    card_names = ["You were too lazy to wear your mask to the toilet and GOT CAUGHT!", 
-                  "You gamed all night yesterday and fell asleep during Physics :(",
-                  "You attended fifth-row!", 
-                  "You got an A for CTD Assignment!", 
-                  "It's ice-cream day! You collected free ice-cream from student government!", 
-                  "Yay! There's no zoom webinar for HASS this week! More sleep!", 
-                  "You bought healthy soup and the uncle gave you free sides! Nomnom...", 
-                  "It's finally the weekend!", 
-                  "It's term-break! Finally some rest...", 
-                  "Oh no! You are late for class!", 
-                  "Crap! You forgot your laundary!", 
-                  "Crap! You lost your room card!", 
-                  "You failed Modelling and Analysis! :(", 
-                  "You failed Physcial World! :(", 
-                  "You failed your finals and you are now in bOOtCAMP! :(", 
-                  "Oww... You bought mixed rice and got food poisoning.", 
-                  "Oh no! You forgot to bring your charger to class and your laptop is dying!"]
+    cards.append(card("You got accepted for scholarship!", "update sanity", 50))
+    cards.append(card("You got an A for CTD Assignment!", "update sanity", 50))
+    cards.append(card("You got an A for HASS Assignment!", "update sanity", 50))
+    cards.append(card("You got an A for Physics Finals!", "update sanity", 50))
+    cards.append(card("You got an A for Math Finals!", "update sanity", 50))
+    cards.append(card("You passed Freshmore Term 1!", "update sanity", 30))
+    cards.append(card("You attended fifth-row!", "update sanity", 30))
+    cards.append(card("Yay! There's no zoom webinar for HASS this week! More sleep!", "update sanity", 10))
+    cards.append(card("It's term-break! Finally some rest...", "update sanity", 10))
     
-    card_effects = [freeze, jail, update_sanity]
-    temp_names = []
+    cards.append(card("Oh no! You are late for class!", "update sanity", -10))
+    cards.append(card("You gamed all night yesterday and fell asleep during class!", "update sanity", -10))
+    cards.append(card("You became the hard carry of your group", "update sanity", -20))
+    cards.append(card("Crap! You forgot your laundry!", "update sanity", -20))
+    cards.append(card("You deleted Rhino after CTD, now you have to re-download it for 2D", "update sanity", -30))
+    cards.append(card("You lost your room card!", "update sanity", -30))
     
-    choice = random.randin (0,len(card_names)-1)
-    print(card_names[choice])
+    cards.append(card("It's ice-cream day! You collected free ice-cream from student government! Everyone gets 20 sanity", "sanity for all",20))
+    cards.append(card("It's your birthday! Receive 20 sanity from all players!", "birthday", "20"))
+    cards.append(card("You failed your finals and you are now in bOOtCAMP!", "lose a property"))    
+    cards.append(card("You were too lazy to wear your mask to the toilet and GOT CAUGHT! You are going to jail!", "go to jail"))
+    cards.append(card("You are now buying from mixed rice stall! Roll double in order to enjoy your meal!", "roll double", "50"))
     
-    if choice == 0:
-        #Need to add new def for freeze help
-        card_effects[0]()
+    carded = list(range(0, len(cards)))
+    # Wouldn't this line make it not possible to remove the card from deck permanently?
+    # Everytime the chance() is executed this line would erase previous' carded list?
+    temp_carded = []
+    randomz = random.choice(carded)
+    carded.remove(randomz)
+    temp_carded.append(randomz)
+    if len(carded) == 0:
+        for i in range(len(temp_carded)):
+            carded.append(temp_carded.pop())
+        
     
-    elif choice == 1: 
-        card_effects[1](player_id)
-
-    elif 0 < choice <= 7:
-        players[player_id].card_effects[1](+val)
-        print ("Congratualations! You have gained", val, "sanity.")
-
-    elif choice >7 :
-        players[player_id].card_effects[1](-val)
-        print ("Aww man... You just lost", val, "sanity")
-
-
-    if len(card_names) == 0:
-        length = len(temp_names)
-        for i in range(length):
-            card_names.append(temp_names.pop())
-    pass
+    print (cards[randomz].get_name())
+    
+    if cards[randomz].get_effect()[0] == "update sanity":
+        if cards[randomz].get_effect()[1] < 0:
+            print ("Your sanity decreased by", cards[randomz].get_effect()[1], "sanity")
+            players[player_id].update_sanity(cards[randomz].get_effect()[1])
+        elif cards[randomz].get_effect()[1] > 0:
+            print ("Your sanity increased by", cards[randomz].get_effect()[1], "sanity")
+            players[player_id].update_sanity(cards[randomz].get_effect()[1])
+            
+    elif cards[randomz].get_effect()[0] == "sanity for all":
+        for i in range(len(players)):
+            players[i].update_sanity(cards[randomz].get_effect()[1])
+        players[player_id].update_sanity(cards[randomz].get_effect()[1])
+        
+    elif cards[randomz].get_effect()[0] == "birthday":
+        for i in range(len(players)):
+                players[i].update_sanity(-cards[randomz].get_effect()[1])
+        player_id.update_sanity(2*cards[randomz].get_effect()[1])
+    
+    elif cards[randomz].get_effect()[0] == "go to jail":
+        jail(player_id)
+        
+    elif cards[randomz].get_effect()[0] == "roll double":
+        #?????
+        pass
+    
+    elif cards[randomz].get_effect()[0] == "lose a property":
+        #property list is under other functions
+        pass
 
 def pay_rent(from_player, to_player, amount):
     
@@ -457,7 +475,7 @@ def gameround(player_id):
                 
         elif tiles[player_pos].get_type()=="chance":
             
-            chance()
+            chance(player_id)
         
         elif tiles[player_pos].get_type()=="tax":
             
