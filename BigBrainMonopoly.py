@@ -92,12 +92,6 @@ class player():
         self.id_no += 1
       
     def get_status(self):
-        if self.__status == "Jail":
-            self.__jail -= 1
-        
-        if self.__jail == 0:
-            self.__status = "Normal"
-            
         return self.__status
     
     def update_status(self,status):
@@ -133,6 +127,12 @@ class player():
     
     def get_jailCount(self):
         return self.__jail
+    
+    def update_jailCount(self):
+        self.__jail -= 1
+        
+        if self.__jail == 0:
+            self.__status = "Normal"
     
 class building():
 
@@ -437,6 +437,13 @@ def buy_building(player, player_id, active_building):
         print("Building owned by:",names[active_building.get_owner()])
     pass
 
+def bankrupt(player_id):
+    pass
+
+def jail_turn(player_id):
+    players[player_id].update_jailCount()
+    pass
+
 # Gameround
 #-------------------------------------------------------------------------#
 def gameround(player_id):
@@ -555,7 +562,8 @@ def game():
         print("\nIt's %s's turn." % (players[counter].get_name()))
         
         if players[counter].get_status() == "Jail":
-            print(f"You're in jail! Turns till freedom: {players[counter].get_jailCount()}.")     
+            print(f"You're in jail! Turns till freedom: {players[counter].get_jailCount()}.")  
+            jail_turn(counter)
         elif players[counter].get_status() == "Normal":
             gameround(counter)
         #Cycling between players
