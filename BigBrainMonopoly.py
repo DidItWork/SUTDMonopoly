@@ -30,7 +30,7 @@ import random
 # building_names - list of building names (strings)
 # building_cost - list of lists of the cost at each of the 3 levels for each respective building
 
-num_of_tiles = 24
+num_of_tiles = 7
 tiles = []
 
 num_players = 0
@@ -86,10 +86,17 @@ class player():
         self.__name = name
         self.__sanity = 500 
         self.__building = []
+        self.__jail = 0
 
         self.id_no += 1
       
     def get_status(self):
+        if self.__status == "Jail":
+            self.__jail -= 1
+        
+        if self.__jail == 0:
+            self.__status = "Normal"
+            
         return self.__status
     
     def update_status(self,status):
@@ -99,6 +106,10 @@ class player():
         if status == "Bankrupt":
             global num_players
             num_players -= 1
+        
+        if status == "Jail":
+            self.__jail = 700
+            pass
     
     def get_position(self):
         return self.__position
@@ -118,7 +129,10 @@ class player():
     
     def update_sanity(self, sanity):
         self.__sanity += sanity
-
+    
+    def get_jailCount(self):
+        return self.__jail
+    
 class building():
 
     def __init__(self, name, cost):
@@ -211,10 +225,8 @@ def home(player_id):
 
 def jail(player_id):
     print("You landed in jail!")
-    players[player_id].update_status("jail")
-    print(players[player_id].get_position())
+    players[player_id].update_status("Jail")
     players[player_id].teleport(jail_pos)
-    print(players[player_id].get_position())
     pass
 
 def tax(player_pos,player_id):
@@ -224,6 +236,9 @@ def tax(player_pos,player_id):
     players[player_id].update_sanity(-val)
     print(players[player_id].get_sanity())
     pass
+
+def free_parking():
+    print("Free parking, take a break!")
     
 def chance(player_id):
     
@@ -430,10 +445,7 @@ def gameround(player_id):
     player = players[player_id]
     
     doubles = 0
-    
-    #Player with player_id plays this round
-    print("It's %s 's turn." % (player.get_name()))
-        
+
     while dice1==dice2:
         # Pseudo code to give the impression of control
         input("Press 'Enter' to roll.")
@@ -495,6 +507,10 @@ def gameround(player_id):
             jail(player_id)
         elif tiles[player_pos].get_type()=="home":
             home(player_id)
+        elif tiles[player_pos].get_type() == "freeParking":
+            free_parking()
+        elif tiles[player_pos].get_type() == "goToJail":
+            jail(player_id)
         else:
             print("Some error occurred.")
             
@@ -532,18 +548,14 @@ def game():
             else:
                 print("Name already exist! Please Reenter name.")
     
-    """
-    Run the game rounds repeatedly until someone win,
-    if the player is bankrupt, skip the player
-    
-    Incomplete code, players can take on multiple statuses such as jail, etc
-    """
-    
     counter = 0
     while num_players != 1:
+        print("\nIt's %s 's turn." % (players[counter].get_name()))
+        
         if players[counter].get_status() == "Normal":
             gameround(counter)
-        
+        elif players[counter].get_status() == "Jail":
+            print(f"You're in jail! Turns till freedom: {players[counter].get_jailCount()}.")
         #Cycling between players
         counter += 1
         counter = counter % num_players
