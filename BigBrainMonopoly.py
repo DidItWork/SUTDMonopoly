@@ -30,7 +30,7 @@ import random
 # building_names - list of building names (strings)
 # building_cost - list of lists of the cost at each of the 3 levels for each respective building
 
-num_of_tiles = 4
+num_of_tiles = 24
 tiles = []
 
 num_players = 0
@@ -38,26 +38,45 @@ players = []
 names = []
 
 pass_go = 200
-jail_pos = 7
-tax_pos = {}
-chance_pos = []
 cards = []
 carded = []
 
-building_pos = list(range(4))
-# building_pos = []
-building_names = ["a","b","c","d"]
+go_pos = 0
+jail_pos = 6
+tax_pos = {9: 100, 21: 100}
+chance_pos = [3, 15]
+freeParking_pos = 12
+goToJail_pos = 18
+building_pos = [1, 2, 4, 5, 7, 8, 10, 11, 13, 14, 16, 17, 19, 20, 22, 23]
 
-building_cost = [[100,200,300],
-                 [100,200,300],
-                 [100,200,300],
-                 [100,200,300]]
+building_info = ["go",
+                ["name1", [100, 200, 300]],
+                ["name2", [100, 200, 300]],
+                "stuff",
+                ["name4", [100, 200, 300]],
+                ["name5", [100, 200, 300]],
+                "stuff",
+                ["name7", [100, 200, 300]],
+                ["name8", [100, 200, 300]],
+                "stuff",
+                ["name10", [100, 200, 300]],
+                ["name11", [100, 200, 300]],
+                "stuff",
+                ["name13", [100, 200, 300]],
+                ["name14", [100, 200, 300]],
+                "stuff",
+                ["name16", [100, 200, 300]],
+                ["name17", [100, 200, 300]],
+                "stuff",
+                ["name19", [100, 200, 300]],
+                ["name20", [100, 200, 300]],
+                "stuff",
+                ["name22", [100, 200, 300]],
+                ["name23", [100, 200, 300]]]
 
 # Defining classes of objects
 #-------------------------------------------------------------------------#
 class player():
-    
-    # for functions on setting variables and getting variable values, use getters and setter
     id_no = 0
     
     def __init__(self, name):
@@ -86,7 +105,7 @@ class player():
     
     def update_position(self, position):
         self.__position += position
-        self.__position = self.__position%num_of_tiles
+        self.__position = self.__position % num_of_tiles
     
     def teleport(self,position):
         self.__position = position
@@ -144,14 +163,14 @@ class building():
 class tile():
     id_no = 0
     
-    def __init__(self, tile_type, building):
+    def __init__(self, tile_type, *building):
         self.__id = self.id_no
         self.id_no += 1
         
         self.__tile_type = tile_type
         
         if self.__tile_type == "building":
-            self.__building = building
+            self.__building = building[0]
     
     def get_type(self):
         return self.__tile_type
@@ -160,23 +179,21 @@ class tile():
         return self.__building
 
 class card():
-	id_no = 0
-	
-    # Notice how it is *cost, the * indicates that cost is an optional argument
-	def __init__(self, name, effect, *cost):
-		self.__id = self.id_no
-		self.__name = name
+    id_no = 0
+    
+    def __init__(self, name, effect, *cost):
+        self.__id = self.id_no
+        self.__name = name
         
-        # Effect will be a tuple of objects
-		self.__effect = effect, *cost
+        self.__effect = effect, *cost
 
-		self.id_no += 1
-	
-	def get_name(self):
-		return self.__name
-	
-	def get_effect(self):
-		return self.__effect
+        self.id_no += 1
+    
+    def get_name(self):
+        return self.__name
+    
+    def get_effect(self):
+        return self.__effect
     
 # Game functions
 #-------------------------------------------------------------------------#
@@ -188,6 +205,7 @@ def roll():
     return dice1, dice2
 
 def home(player_id):
+    global pass_go
     players[player_id].update_sanity(pass_go)    
     pass
 
@@ -205,11 +223,13 @@ def tax(player_pos,player_id):
 NOTE TO SELF: REMEMBER TO ADD THE PASS_GO FUNCTION
 """
 
-def pass_go():
+def pass_go1(player_id):
     pass
     
 def chance(player_id):
+    
     global carded
+    
     # Re-init carded if its empty
     if len(carded) == 0:
         carded = list(range(len(cards)))
@@ -246,6 +266,7 @@ def chance(player_id):
         
     # If "roll"
     elif cards[randomz].get_effect()[0] == "roll double":
+        
         dice1, dice2 = roll()
         
         # Roll function is as follows, try to see if you can manipulate the tuple
@@ -371,7 +392,7 @@ def pay_rent(from_player, to_player, amount):
 
 def upgrade_building(active_building, player):
     buy = "z"
-    print(type(active_building.get_level() + 1))
+    print(active_building.get_level() + 1)
     while buy[0] not in "yYnN":
         buy = input("Do you want to upgrade %s to Level %s , cost: %s sanity [y/n]? " 
                      % (active_building.get_name(), 
@@ -438,7 +459,7 @@ def gameround(player_id):
             active_building = tiles[player_pos].get_building()
             
             # If tile is empty and can afford
-            if active_building.get_owner() == None and active_building.get_cost()<=player.get_sanity():
+            if active_building.get_owner() == None and active_building.get_cost() <= player.get_sanity():
                 buy_building(player, player_id, active_building)
             
             # If landed on an owned tile
@@ -464,7 +485,7 @@ def gameround(player_id):
                 
         # Other tiles
         elif tiles[player_pos].get_type()=="chance":
-            chance()
+            chance(player_id)
         elif tiles[player_pos].get_type()=="tax":
             tax(player_pos,player_id)
         elif tiles[player_pos].get_type()=="jail":
@@ -512,13 +533,13 @@ def game():
     Run the game rounds repeatedly until someone win,
     if the player is bankrupt, skip the player
     
-    Incomplete code, players can take on multiple statuses
+    Incomplete code, players can take on multiple statuses such as jail, etc
     """
     
     counter = 0
     while num_players != 1:
         if players[counter].get_status() == "Normal":
-           gameround(counter)
+            gameround(counter)
         
         #Cycling between players
         counter += 1
@@ -538,16 +559,26 @@ def game():
 def render_game():
     # Initialize the tiles accordingly
     for i in range(num_of_tiles):
-        if i == 0:
-            tiles.append(tile("home",""))
-        elif i in building_pos:
-            tiles.append(tile("building", building(building_names[i], building_cost[i])))
+        if i in building_pos:
+            tiles.append(tile("building", building(building_info[i][0], building_info[i][1])))
         elif i in chance_pos:
             tiles.append(tile("chance",""))
-        elif i in jail_pos:
-            tiles.append(tile("jail",""))
+            print("chance working")
         elif i in tax_pos:
             tiles.append(tile("tax",""))
+            print("tax working")
+        elif i == go_pos:
+            tiles.append(tile("home", ""))
+            print("home working")
+        elif i == jail_pos:
+            tiles.append(tile("jail",""))
+            print("jail working")
+        elif i == goToJail_pos:
+            tiles.append(tile("goToJail", ""))
+            print("go to jail working")
+        elif i == freeParking_pos:
+            tiles.append(tile("freeParking", ""))
+            print("free parking working")
             
     # Initialising chance cards            
     cards.append(card("You got accepted for scholarship!", "update sanity", 50))
