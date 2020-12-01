@@ -31,7 +31,7 @@ import random
 # cont. building_info[x] are building names
 # cont. building_info[x][y] are building costs (if applicable)
 
-num_of_tiles = 7
+num_of_tiles = 24
 tiles = []
 
 num_players = 0
@@ -109,7 +109,7 @@ class player():
             num_players -= 1
         
         if status == "Jail":
-            self.__jail = 700
+            self.__jail = 3
             pass
     
     def get_position(self):
@@ -332,6 +332,9 @@ def pay_rent(from_player, to_player, amount):
         players[from_player].update_sanity(-amount)
         players[to_player].update_sanity(amount)
         amount = 0
+        print(amount, -amount)
+        print("Payer %s : " % names[from_player], players[from_player].get_sanity())
+        print("Landlord %s : " % names[to_player], players[to_player].get_sanity())
         return
         
     # Optional statement
@@ -390,7 +393,6 @@ def pay_rent(from_player, to_player, amount):
             # Update amount according to the buildings sold
             amount -= sell_building[sell][2]
             tiles[sell_building[sell][0]].get_building().set_ownership(to_player)
-            print(tiles[sell_building[sell][0]].get_building().get_owner())
             
             sell_building.pop(sell)
             
@@ -460,6 +462,7 @@ def gameround(player_id):
             
         if doubles == 3:
             jail(player_id)
+            return
             
         player_pos = player.get_position()
         if player_pos + step > num_of_tiles:
@@ -486,7 +489,7 @@ def gameround(player_id):
             
             # If landed on own building, upgrade if possible
             elif active_building.get_owner() == player_id:
-                if active_building.get_level() > 2:
+                if active_building.get_level() >= 2:
                     print("Building at max level!")
                 elif active_building.get_cost() > player.get_sanity():
                     print("Sorry, you do not have enough sanity to upgrade this building.")
@@ -503,7 +506,7 @@ def gameround(player_id):
         elif tiles[player_pos].get_type()=="tax":
             tax(player_pos,player_id)
         elif tiles[player_pos].get_type()=="jail":
-            jail(player_id)
+            print("Visiting jail.")
         elif tiles[player_pos].get_type()=="home":
             home(player_id)
         elif tiles[player_pos].get_type() == "freeParking":
@@ -551,10 +554,10 @@ def game():
     while num_players != 1:
         print("\nIt's %s's turn." % (players[counter].get_name()))
         
-        if players[counter].get_status() == "Normal":
+        if players[counter].get_status() == "Jail":
+            print(f"You're in jail! Turns till freedom: {players[counter].get_jailCount()}.")     
+        elif players[counter].get_status() == "Normal":
             gameround(counter)
-        elif players[counter].get_status() == "Jail":
-            print(f"You're in jail! Turns till freedom: {players[counter].get_jailCount()}.")
         #Cycling between players
         counter += 1
         counter = counter % num_players
@@ -577,22 +580,16 @@ def render_game():
             tiles.append(tile("building", building(building_info[i][0], building_info[i][1])))
         elif i in chance_pos:
             tiles.append(tile("chance",""))
-            print("chance working")
         elif i in tax_pos:
             tiles.append(tile("tax",""))
-            print("tax working")
         elif i == go_pos:
             tiles.append(tile("home", ""))
-            print("home working")
         elif i == jail_pos:
             tiles.append(tile("jail",""))
-            print("jail working")
         elif i == goToJail_pos:
             tiles.append(tile("goToJail", ""))
-            print("go to jail working")
         elif i == freeParking_pos:
             tiles.append(tile("freeParking", ""))
-            print("free parking working")
             
     # Initialising chance cards            
     cards.append(card("You got accepted for scholarship!", "update sanity", 50))
