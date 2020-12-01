@@ -43,34 +43,34 @@ carded = []
 
 go_pos = 0
 jail_pos = 6
-tax_pos = {9: 100, 21: 100}
+tax_pos = {9: 100, 21: 50}
 chance_pos = [3, 15]
 freeParking_pos = 12
 goToJail_pos = 18
 building_pos = [1, 2, 4, 5, 7, 8, 10, 11, 13, 14, 16, 17, 19, 20, 22, 23]
 
-building_info = ["go",
+building_info = ["home",
                 ["name1", [100, 200, 300]],
                 ["name2", [100, 200, 300]],
-                "stuff",
+                "chance",
                 ["name4", [100, 200, 300]],
                 ["name5", [100, 200, 300]],
-                "stuff",
+                "jail",
                 ["name7", [100, 200, 300]],
                 ["name8", [100, 200, 300]],
-                "stuff",
+                "tax",
                 ["name10", [100, 200, 300]],
                 ["name11", [100, 200, 300]],
-                "stuff",
+                "free parking",
                 ["name13", [100, 200, 300]],
                 ["name14", [100, 200, 300]],
-                "stuff",
+                "chance",
                 ["name16", [100, 200, 300]],
                 ["name17", [100, 200, 300]],
-                "stuff",
+                "go to jail",
                 ["name19", [100, 200, 300]],
                 ["name20", [100, 200, 300]],
-                "stuff",
+                "tax",
                 ["name22", [100, 200, 300]],
                 ["name23", [100, 200, 300]]]
 
@@ -116,7 +116,7 @@ class player():
     def get_sanity(self):
         return self.__sanity
     
-    def update_sanity(self,sanity):
+    def update_sanity(self, sanity):
         self.__sanity += sanity
 
 class building():
@@ -205,25 +205,24 @@ def roll():
     return dice1, dice2
 
 def home(player_id):
-    global pass_go
-    players[player_id].update_sanity(pass_go)    
+    print("Pass go, regain 200 sanity!")
+    players[player_id].update_sanity(pass_go)
     pass
 
 def jail(player_id):
+    print("You landed in jail!")
     players[player_id].update_status("jail")
+    print(players[player_id].get_position())
     players[player_id].teleport(jail_pos)
+    print(players[player_id].get_position())
     pass
 
 def tax(player_pos,player_id):
     val = tax_pos[player_pos]
+    print(f"Opps, you lost {val} sanity.")
+    print(players[player_id].get_sanity())
     players[player_id].update_sanity(-val)
-    pass
-
-"""
-NOTE TO SELF: REMEMBER TO ADD THE PASS_GO FUNCTION
-"""
-
-def pass_go1(player_id):
+    print(players[player_id].get_sanity())
     pass
     
 def chance(player_id):
@@ -450,6 +449,10 @@ def gameround(player_id):
             
         if doubles == 3:
             jail(player_id)
+            
+        player_pos = player.get_position()
+        if player_pos + step > num_of_tiles:
+            home(player_id)
         
         player.update_position(step)
         player_pos = player.get_position()
