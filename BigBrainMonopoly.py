@@ -27,8 +27,9 @@ import random
 # building_pos - position of the buildings on the respective tiles, 
 # cont. 0-39 anticlockwise starting from bottom left, i.e. GO is 0
 
-# building_names - list of building names (strings)
-# building_cost - list of lists of the cost at each of the 3 levels for each respective building
+# building_info - nested list of building information
+# cont. building_info[x] are building names
+# cont. building_info[x][y] are building costs (if applicable)
 
 num_of_tiles = 7
 tiles = []
