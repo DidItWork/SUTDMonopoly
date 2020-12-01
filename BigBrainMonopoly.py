@@ -549,7 +549,7 @@ def game():
     
     counter = 0
     while num_players != 1:
-        print("\nIt's %s 's turn." % (players[counter].get_name()))
+        print("\nIt's %s's turn." % (players[counter].get_name()))
         
         if players[counter].get_status() == "Normal":
             gameround(counter)
