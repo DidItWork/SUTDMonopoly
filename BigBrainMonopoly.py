@@ -524,7 +524,7 @@ def gameround(player_id):
         if tiles[player_pos].get_type()=="building":
             active_building = tiles[player_pos].get_building()
             
-            print(f"You landed on {tiles[player_pos].get_building().get_name()}.\n")
+            print(f"You landed on {tiles[player_pos].get_building().get_name()}.")
         
             # If tile is empty and can afford
             if active_building.get_owner() == None and active_building.get_cost() <= player.get_sanity():
