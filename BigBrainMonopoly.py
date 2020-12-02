@@ -289,9 +289,9 @@ def chance(player_id):
         players[player_id].update_sanity(cards[randomz].get_effect()[1])
         
         if cards[randomz].get_effect()[1] < 0:
-            print ("Your sanity decreased by", cards[randomz].get_effect()[1], "sanity")
+            print ("Your sanity decreased by", cards[randomz].get_effect()[1], "sanity.")
         elif cards[randomz].get_effect()[1] > 0:
-            print ("Your sanity increased by", cards[randomz].get_effect()[1], "sanity")
+            print ("Your sanity increased by", cards[randomz].get_effect()[1], "sanity.")
 
     # If "sanity for all"
     elif cards[randomz].get_effect()[0] == "sanity for all":
@@ -315,6 +315,7 @@ def chance(player_id):
         dice1, dice2 = roll()
         print("Roll 1:", dice1)
         print("Roll 2:", dice2)
+        print("\n")
         
         if dice1 == dice2:
             players[player_id].update_sanity(cards[randomz].get_effect()[1])
@@ -381,12 +382,13 @@ def pay_rent(from_player, to_player, amount):
         return
     
     bankrupt(amount, from_player, to_player)
+    input("waiting")
     pass
 
 def upgrade_building(active_building, player):
     buy = "z"
     while buy[0] not in "yYnN":
-        buy = input("Do you want to upgrade %s to Level %s , cost: %s sanity [y/n]?" 
+        buy = input("Do you want to upgrade %s to Level %s , cost: %s sanity [y/n]? " 
                      % (active_building.get_name(), 
                         active_building.get_level() + 2, 
                         active_building.get_cost(active_building.get_level() + 1)))
@@ -508,7 +510,7 @@ def gameround(player_id):
 
     while dice1==dice2:
         # Pseudo code to give the impression of control
-        input("Press 'Enter' to roll.")
+        input("\nPress 'Enter' to roll.")
         
         dice1, dice2 = roll()
         print("Roll 1:", dice1)
@@ -520,6 +522,7 @@ def gameround(player_id):
             doubles += 1
             
         if doubles == 3:
+            print("You rolled a double 3 times a row! You're going to JAIL for being a CHEATER!")
             jail(player_id)
             return
             
@@ -613,9 +616,14 @@ def game():
     # Initialising variables
     render_game()
     
+    """
+    There's a bug here, where the tracking of the players and turns isn't perfect
+    when there is more than 2 players
+    """
+    
     counter = 0
     while num_players > 1:
-        print("\n\nIt's %s's turn." % (players[counter].get_name()))
+        print("\nIt's %s's turn." % (players[counter].get_name()))
                 
         if players[counter].get_status() == "Jail":
             jail_turn(counter)
@@ -635,13 +643,14 @@ def game():
             
     print(f"\nCongrats to {winner}!\nWinner: {winner}!")
     
-    end = ""
-    while end != "end":
-        end = input("Enter 'end' to close window. ")
-        end = end.lower()
+    end_key = ""
+    while end_key != "end":
+        end_key = input("Enter 'end' to close window. ")
+        end_key = end_key.lower()
     pass
 
 def render_game():
+
     # Initialize the tiles accordingly
     for i in range(num_of_tiles):
         if i in building_pos:
