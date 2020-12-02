@@ -188,13 +188,10 @@ class building():
     def get_cost(self, *level):
         cost = 0
 
-        if len(level) == 0:  
-            if self.__level == 0:
-                return self.__cost[0]
-            else:
-                for i in range(self.__level):
-                    cost += self.__cost[i]
-                return cost
+        if len(level) == 0:
+            for i in range(self.__level + 1):
+                cost += self.__cost[i]
+            return cost
         else:
             return self.__cost[level[0]]
         
@@ -370,7 +367,7 @@ def chance(player_id):
             if tiles[i].get_building().get_owner() == players[player_id]:
                 owned_building.append(i)
                 owned_building.append(tiles[i].get_building().get_name())
-                owned_building.append(tiles[i].get_building().get_cost(tiles[i].get_building().get_level()))
+                owned_building.append(tiles[i].get_building().get_cost())
                 
                 lose_building.append(owned_building[:])
                 owned_building = []
