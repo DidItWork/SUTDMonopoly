@@ -831,7 +831,7 @@ def initUI():
 def update_board():
     for key in priceIDs:
         widg.itemconfigure(priceIDs[key], text = tiles[key].get_building().get_rent())
-        widg.itemconfigure(ownedIDs[key], text = tiles[key].get_building().get_owner())
+        widg.itemconfigure(ownedIDs[key], text = players[tiles[key].get_building().get_owner()])
     for key in playerIDs:
         position = players[key].get_position()
         status = players[key].get_status()
