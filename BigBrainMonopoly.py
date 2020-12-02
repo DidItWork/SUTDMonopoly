@@ -55,7 +55,7 @@ building_pos = [1, 2, 4, 5, 7, 8, 10, 11, 13, 14, 16, 17, 19, 20, 22, 23]
 
 building_info = ["home",
                 ["Smith’s invisible hand", "Smith", [120, 150, 210]],
-                ["Geertz’s fighting cocks", "truncated2", [120, 150, 210]],
+                ["Geertz’s fighting cocks", "Geertz", [120, 150, 210]],
                 "chance",
                 ["L’Hopital’s Glue", "L’Hopital", [80, 100, 140]],
                 ["Riemann’s Sun", "Riemann", [120, 150, 210]],
@@ -318,11 +318,11 @@ def chance(player_id):
         
         if dice1 == dice2:
             players[player_id].update_sanity(cards[randomz].get_effect()[1])
-            print ("You gobled down your caifan like a vaccum cleaner. But you are fine!")
+            print ("You gobled down your caifan like a vaccum cleaner...\n...\nbut you are fine!")
             print ("Your sanity increased by", card[randomz].get_effect()[1], "sanity")
         else:
             players[player_id].update_sanity(-cards[randomz].get_effect()[1])
-            print ("You gobled down your caifan like a vaccum cleaner and got food poisoning!")
+            print ("You gobled down your caifan like a vaccum cleaner...\n...\nand got food poisoning!")
             print ("Your sanity decreased by", cards[randomz].get_effect()[1], "sanity.")
     
     # If "lose property"
@@ -348,7 +348,7 @@ def chance(player_id):
             
         # If player owns building, give an option to choose a building to sell
         else: 
-            print("Index", "Name", "Value")
+            print("Index", "Name", "Value", "\n")
             for index, value in enumerate(lose_building):
                 print(index + 1, value[1], value[2])
 
@@ -386,7 +386,7 @@ def pay_rent(from_player, to_player, amount):
 def upgrade_building(active_building, player):
     buy = "z"
     while buy[0] not in "yYnN":
-        buy = input("Do you want to upgrade %s to Level %s , cost: %s sanity [y/n]? " 
+        buy = input("Do you want to upgrade %s to Level %s , cost: %s sanity [y/n]?" 
                      % (active_building.get_name(), 
                         active_building.get_level() + 2, 
                         active_building.get_cost(active_building.get_level() + 1)))
@@ -396,7 +396,6 @@ def upgrade_building(active_building, player):
     if buy[0] in "yY":
         active_building.level_up()
         player.update_sanity(-active_building.get_cost())
-        print("Building owned by:",names[active_building.get_owner()])
     pass
 
 def buy_building(player, player_id, active_building):
@@ -533,7 +532,7 @@ def gameround(player_id):
         update_board()
         
         player_pos = player.get_position()
-        print("Player position:", player_pos, "\n")
+        # print("Player position:", player_pos, "\n")
 
         if tiles[player_pos].get_type()=="building":
             active_building = tiles[player_pos].get_building()
@@ -550,7 +549,7 @@ def gameround(player_id):
                 
                 # Break if player goes bankrupt here
                 if player.get_status() == "Bankrupt":
-                    break
+                    return
             
             # If landed on own building, upgrade if possible
             elif active_building.get_owner() == player_id:
@@ -615,8 +614,8 @@ def game():
     render_game()
     
     counter = 0
-    while num_players != 1:
-        print("\nIt's %s's turn." % (players[counter].get_name()))
+    while num_players > 1:
+        print("\n\nIt's %s's turn." % (players[counter].get_name()))
                 
         if players[counter].get_status() == "Jail":
             jail_turn(counter)
@@ -627,17 +626,19 @@ def game():
         #Cycling between players
         counter += 1
         counter = counter % num_players
-    top.mainloop()
     
     # When there's only 1 player left, announce winner of the game
     winner = ""
     for play in players:
         if play.get_status() == "Normal":
-            winner = play.get_name()
-            break
+            winner = player.get_name()
             
-    print("\nWinner: " + winner + "!")
+    print(f"\nCongrats to {winner}!\nWinner: {winner}!")
     
+    end = ""
+    while end != "end":
+        end = input("Enter 'end' to close window. ")
+        end = end.lower()
     pass
 
 def render_game():
@@ -808,8 +809,6 @@ def update_board():
             elif position > 18:
                 pos[1] -= (23 - position)*boxLength + boxHeight
             widg.moveto(playerIDs[key], pos[0], pos[1])
-    
-    print("Updating")
     return
     pass
 
