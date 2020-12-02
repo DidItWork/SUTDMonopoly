@@ -401,12 +401,6 @@ def pay_rent(from_player, to_player, amount):
     print("\nRent time!")
     print(f"Pay {amount} sanity to {names[to_player]}.")
     
-    """
-    # Optional statement
-    print("Payer %s : " % names[from_player], players[from_player].get_sanity())
-    print("Landlord %s : " % names[to_player], players[to_player].get_sanity())
-    """
-    
     # Check if there's enough sanity to transfer
     if int(players[from_player].get_sanity()) < amount:
         leftovers = int(players[from_player].get_sanity())
@@ -419,13 +413,6 @@ def pay_rent(from_player, to_player, amount):
         players[from_player].update_sanity(-amount)
         players[to_player].update_sanity(amount)
         return
-        
-    """
-    # Optional statement
-    print(amount, -amount)
-    print("Payer %s : " % names[from_player], players[from_player].get_sanity())
-    print("Landlord %s : " % names[to_player], players[to_player].get_sanity())
-    """
     
     bankrupt(amount, from_player, to_player)
     pass
@@ -576,6 +563,9 @@ def gameround(player_id):
             home(player_id)
         
         player.update_position(step)
+        
+        update_board()
+        
         player_pos = player.get_position()
         print("Player position:", player_pos, "\n")
 
@@ -634,10 +624,7 @@ def gameround(player_id):
 
 # Initialize variables and players
 #-------------------------------------------------------------------------#
-def game():
-    # Initialising variables
-    render_game()
-    
+def game():    
     # Get number of players
     global num_players
     while num_players < 2 or num_players > 5:
@@ -659,7 +646,10 @@ def game():
                 break
             else:
                 print("Name already exist! Please Reenter name.")
-    initUI()
+                
+    # Initialising variables
+    render_game()
+    
     counter = 0
     while num_players != 1:
         print("\nIt's %s's turn." % (players[counter].get_name()))
@@ -668,8 +658,8 @@ def game():
             jail_turn(counter)
         
         if players[counter].get_status() == "Normal":
-            gameround(counter)
-        update_board()    
+            gameround(counter) 
+        
         #Cycling between players
         counter += 1
         counter = counter % num_players
@@ -734,6 +724,8 @@ def render_game():
     # Change carded on the global scale
     global carded
     carded = list(range(len(cards)))
+    
+    initUI()
     
 # GUI/Board functions
 #-------------------------------------------------------------------------#
@@ -866,4 +858,3 @@ def update_board():
 
 #Run the game
 game()
-#putting mainloop here doesn't work
