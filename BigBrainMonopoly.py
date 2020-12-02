@@ -78,10 +78,15 @@ building_info = ["home",
                 ["name22", "truncated22", [100, 200, 300]],
                 ["name23", "truncated23", [100, 200, 300]]]
 
+#Initialise parameters for the GUI
+#-------------------------------------------------------------------------#
 boxLength = 100
 boxHeight = 130
 smolBoxHt = 90
 rot = [270, 180, 90, 0]
+priceIDs = {}
+ownedIDs = {}
+playerIDs = {}
 
 cornerPos = num_of_tiles/4
 cornerXYs = [[boxHeight+5*boxLength, boxHeight+5*boxLength, 2*boxHeight+ 5*boxLength, 2*boxHeight+ 5*boxLength], 
@@ -235,42 +240,6 @@ class card():
     
     def get_effect(self):
         return self.__effect
-    
-# GUI-Related Functions
-#-------------------------------------------------------------------------#
-def avg(coordLs, xy):
-    if xy == "x":
-        mean = (coordLs[0]+coordLs[2])/2
-    elif xy == 'y':
-        mean = (coordLs[1]+coordLs[3])/2
-    else:
-        return None
-    return mean
-        
-
-def getProperties(coord, ori, thisId):
-    
-    centre = [avg(coord, 'x'), avg(coord, 'y')]
-    smolBox = coord.copy()
-    if(type(ori) is int): #Normal tile (not corner)
-        smolBox[ori] += ((-1)**(ori < 0))*smolBoxHt
-        namePos = [avg(smolBox, 'x') , avg(smolBox, 'y')]
-        textRot = rot[ori]
-        
-        if (ori%2 == 0):
-            bottom = [((-1)**(ori < 0))*10+coord[ori], avg(coord, 'y')]
-            ownerPos = [((-1)**(ori >= 0))*30+namePos[0], namePos[1]]
-        else:
-            bottom = [avg(coord, 'x'), ((-1)**(ori < 0))*10+coord[ori]]
-            ownerPos = [namePos[0], ((-1)**(ori >= 0))*30+namePos[1]]
-    else: #If it's a corner
-        smolBox[-1] -= boxHeight-smolBoxHt
-        smolBox[0] += boxHeight-smolBoxHt
-        bottom = None
-        textRot = None
-        namePos = [avg(smolBox, 'x') , avg(smolBox, 'y')]
-        ownerPos = None
-    return (thisId, smolBox, centre, bottom, namePos, ownerPos, textRot) 
     
 # Game functions
 #-------------------------------------------------------------------------#
@@ -724,9 +693,6 @@ def render_game():
     
 # GUI/Board functions
 #-------------------------------------------------------------------------#
-priceIDs = {}
-ownedIDs = {}
-playerIDs = {}
 
 def initUI():    
     
@@ -847,5 +813,38 @@ def update_board():
     return
     pass
 
+def avg(coordLs, xy):
+    if xy == "x":
+        mean = (coordLs[0]+coordLs[2])/2
+    elif xy == 'y':
+        mean = (coordLs[1]+coordLs[3])/2
+    else:
+        return None
+    return mean
+
+def getProperties(coord, ori, thisId):
+    
+    centre = [avg(coord, 'x'), avg(coord, 'y')]
+    smolBox = coord.copy()
+    if(type(ori) is int): #Normal tile (not corner)
+        smolBox[ori] += ((-1)**(ori < 0))*smolBoxHt
+        namePos = [avg(smolBox, 'x') , avg(smolBox, 'y')]
+        textRot = rot[ori]
+        
+        if (ori%2 == 0):
+            bottom = [((-1)**(ori < 0))*10+coord[ori], avg(coord, 'y')]
+            ownerPos = [((-1)**(ori >= 0))*30+namePos[0], namePos[1]]
+        else:
+            bottom = [avg(coord, 'x'), ((-1)**(ori < 0))*10+coord[ori]]
+            ownerPos = [namePos[0], ((-1)**(ori >= 0))*30+namePos[1]]
+    else: #If it's a corner
+        smolBox[-1] -= boxHeight-smolBoxHt
+        smolBox[0] += boxHeight-smolBoxHt
+        bottom = None
+        textRot = None
+        namePos = [avg(smolBox, 'x') , avg(smolBox, 'y')]
+        ownerPos = None
+    return (thisId, smolBox, centre, bottom, namePos, ownerPos, textRot) 
+    
 #Run the game
 game()
