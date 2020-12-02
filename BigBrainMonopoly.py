@@ -42,6 +42,9 @@ pass_go = 200
 cards = []
 carded = []
 
+tax_name = "tax"
+go_name = "Pass go"
+
 go_pos = 0
 jail_pos = 6
 tax_pos = {9: 100, 21: 50}
@@ -51,29 +54,29 @@ goToJail_pos = 18
 building_pos = [1, 2, 4, 5, 7, 8, 10, 11, 13, 14, 16, 17, 19, 20, 22, 23]
 
 building_info = ["home",
-                ["name1", [100, 200, 300]],
-                ["name2", [100, 200, 300]],
+                ["name1", "truncated1", [100, 200, 300]],
+                ["name2", "truncated2", [100, 200, 300]],
                 "chance",
-                ["name4", [100, 200, 300]],
-                ["name5", [100, 200, 300]],
+                ["name4", "truncated3", [100, 200, 300]],
+                ["name5", "truncated4", [100, 200, 300]],
                 "jail",
-                ["name7", [100, 200, 300]],
-                ["name8", [100, 200, 300]],
+                ["name7", "truncated7", [100, 200, 300]],
+                ["name8", "truncated8", [100, 200, 300]],
                 "tax",
-                ["name10", [100, 200, 300]],
-                ["name11", [100, 200, 300]],
+                ["name10", "truncated10", [100, 200, 300]],
+                ["name11", "truncated11", [100, 200, 300]],
                 "free parking",
-                ["name13", [100, 200, 300]],
-                ["name14", [100, 200, 300]],
+                ["name13", "truncated13", [100, 200, 300]],
+                ["name14", "truncated14", [100, 200, 300]],
                 "chance",
-                ["name16", [100, 200, 300]],
-                ["name17", [100, 200, 300]],
+                ["name16", "truncated16", [100, 200, 300]],
+                ["name17", "truncated17", [100, 200, 300]],
                 "go to jail",
-                ["name19", [100, 200, 300]],
-                ["name20", [100, 200, 300]],
+                ["name19", "truncated19", [100, 200, 300]],
+                ["name20", "truncated20", [100, 200, 300]],
                 "tax",
-                ["name22", [100, 200, 300]],
-                ["name23", [100, 200, 300]]]
+                ["name22", "truncated22", [100, 200, 300]],
+                ["name23", "truncated23", [100, 200, 300]]]
 
 # Defining classes of objects
 #-------------------------------------------------------------------------#
@@ -136,12 +139,13 @@ class player():
     
 class building():
 
-    def __init__(self, name, cost):
+    def __init__(self, name, truncated, cost):
         
         self.__level = 0
         self.__owner = None
         self.__cost = cost
         self.__name = name
+        self.__truncated = truncated
     
     def get_rent(self):
         # rent of building calculated from cost and level 
@@ -155,6 +159,9 @@ class building():
 
     def get_name(self):
         return self.__name
+
+    def get_truncated(self):
+        return self.__truncated
     
     def get_cost(self, *level):
         cost = 0
@@ -220,7 +227,7 @@ def roll():
     return dice1, dice2
 
 def home(player_id):
-    print("Pass go, regain 200 sanity!")
+    print(f"{go_name}, regain {pass_go} sanity!")
     players[player_id].update_sanity(pass_go)
     pass
 
@@ -232,7 +239,7 @@ def jail(player_id):
 
 def tax(player_pos,player_id):
     val = tax_pos[player_pos]
-    print(f"Opps, you lost {val} sanity.")
+    print(f"Opps, you landed on {tax_name} and lost {val} sanity.")
     players[player_id].update_sanity(-val)
     pass
 
@@ -313,12 +320,14 @@ def chance(player_id):
         pass
     
 def pay_rent(from_player, to_player, amount):
-    print("Rent time")
+    print("Rent time!")
+    print(f"Pay {amount} sanity to {names[to_player]}.")
     
+    """
     # Optional statement
-    print(amount, -amount)
     print("Payer %s : " % names[from_player], players[from_player].get_sanity())
     print("Landlord %s : " % names[to_player], players[to_player].get_sanity())
+    """
     
     # Check if there's enough sanity to transfer
     if int(players[from_player].get_sanity()) < amount:
@@ -331,16 +340,14 @@ def pay_rent(from_player, to_player, amount):
     else:
         players[from_player].update_sanity(-amount)
         players[to_player].update_sanity(amount)
-        amount = 0
-        print(amount, -amount)
-        print("Payer %s : " % names[from_player], players[from_player].get_sanity())
-        print("Landlord %s : " % names[to_player], players[to_player].get_sanity())
         return
         
+    """
     # Optional statement
     print(amount, -amount)
     print("Payer %s : " % names[from_player], players[from_player].get_sanity())
     print("Landlord %s : " % names[to_player], players[to_player].get_sanity())
+    """
     
     # Initialize some local variables for later
     sell = 0
@@ -377,6 +384,7 @@ def pay_rent(from_player, to_player, amount):
     # If owner owns building, give an option to liquidate assets until amount == 0
     else:
         while amount > 0:
+            print(f"\nYou still owe {int(amount)} sanity.\n")
             print("Index", "Name", "Value")
             for index, value in enumerate(sell_building):
                 print(index + 1, value[1], value[2])
@@ -407,7 +415,6 @@ def pay_rent(from_player, to_player, amount):
 
 def upgrade_building(active_building, player):
     buy = "z"
-    print(active_building.get_level() + 1)
     while buy[0] not in "yYnN":
         buy = input("Do you want to upgrade %s to Level %s , cost: %s sanity [y/n]? " 
                      % (active_building.get_name(), 
@@ -419,7 +426,6 @@ def upgrade_building(active_building, player):
     if buy[0] in "yY":
         active_building.level_up()
         player.update_sanity(-active_building.get_cost())
-        print(player.get_sanity())
         print("Building owned by:",names[active_building.get_owner()])
     pass
 
@@ -433,15 +439,28 @@ def buy_building(player, player_id, active_building):
     if buy[0] in "yY":
         active_building.set_ownership(player_id)
         player.update_sanity(-active_building.get_cost())
-        print(player.get_sanity())
-        print("Building owned by:",names[active_building.get_owner()])
+        print(f"{active_building.get_name()} is now owned by: {names[active_building.get_owner()]}")
     pass
 
 def bankrupt(player_id):
     pass
 
 def jail_turn(player_id):
-    players[player_id].update_jailCount()
+    if players[player_id].get_jailCount() > 1:
+        input("Roll a double to break out of jail! Press 'Enter' to roll.")
+        dice1, dice2 = roll()
+        
+        print(f"Roll 1: {dice1}")
+        print(f"Roll 2: {dice2}")
+        
+        if dice1 == dice2:
+            players[player_id].update_status("Normal")
+            print("PRISON BREAK!!!")
+        else:
+            players[player_id].update_jailCount()
+            print(f"You're still in jail! Turns till freedom: {players[player_id].get_jailCount()}.")
+    else:
+        players[player_id].update_jailCount()
     pass
 
 # Gameround
@@ -477,11 +496,13 @@ def gameround(player_id):
         
         player.update_position(step)
         player_pos = player.get_position()
-        print("Player position:", player.get_position())
-        
+        print("Player position:", player_pos, "\n")
+
         if tiles[player_pos].get_type()=="building":
             active_building = tiles[player_pos].get_building()
             
+            print(f"You landed on {tiles[player_pos].get_building().get_name()}.")
+        
             # If tile is empty and can afford
             if active_building.get_owner() == None and active_building.get_cost() <= player.get_sanity():
                 buy_building(player, player_id, active_building)
@@ -513,13 +534,14 @@ def gameround(player_id):
         elif tiles[player_pos].get_type()=="tax":
             tax(player_pos,player_id)
         elif tiles[player_pos].get_type()=="jail":
-            print("Visiting jail.")
+            print("Wave to those suckers in jail!")
         elif tiles[player_pos].get_type()=="home":
             home(player_id)
         elif tiles[player_pos].get_type() == "freeParking":
             free_parking()
         elif tiles[player_pos].get_type() == "goToJail":
             jail(player_id)
+            return
         else:
             print("Some error occurred.")
             
@@ -562,10 +584,11 @@ def game():
         print("\nIt's %s's turn." % (players[counter].get_name()))
         
         if players[counter].get_status() == "Jail":
-            print(f"You're in jail! Turns till freedom: {players[counter].get_jailCount()}.")  
             jail_turn(counter)
-        elif players[counter].get_status() == "Normal":
+        
+        if players[counter].get_status() == "Normal":
             gameround(counter)
+            
         #Cycling between players
         counter += 1
         counter = counter % num_players
@@ -585,7 +608,9 @@ def render_game():
     # Initialize the tiles accordingly
     for i in range(num_of_tiles):
         if i in building_pos:
-            tiles.append(tile("building", building(building_info[i][0], building_info[i][1])))
+            tiles.append(tile("building", building(building_info[i][0], 
+                                                   building_info[i][1],
+                                                   building_info[i][2])))
         elif i in chance_pos:
             tiles.append(tile("chance",""))
         elif i in tax_pos:
@@ -598,7 +623,7 @@ def render_game():
             tiles.append(tile("goToJail", ""))
         elif i == freeParking_pos:
             tiles.append(tile("freeParking", ""))
-            
+
     # Initialising chance cards            
     cards.append(card("You got accepted for scholarship!", "update sanity", 50))
     cards.append(card("You got an A for CTD Assignment!", "update sanity", 50))
@@ -631,23 +656,11 @@ def render_game():
 # GUI/Board functions
 #-------------------------------------------------------------------------#
 def update_board():
-    
-    #return an updated board from the old board
-    
-    # Tim will do this
-    print("Updating")
-    return
+    # Incomplete
     pass
 
-def display_board():
-    
-    # probably use some print function to do so
-    #display board
-    
-    # Tim will do this
-    
-    print("Display board")
-    return
+def display_board():    
+    # Incomplete
     pass
 
 #Run the game
