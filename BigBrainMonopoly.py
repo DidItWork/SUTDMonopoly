@@ -278,38 +278,51 @@ def chance(player_id):
     if len(carded) == 0:
         carded = list(range(len(cards)))
     
-    # Call this something else hahaha, randomz was just an example
-    randomz = random.choice(carded)
-    carded.remove(randomz)
+    # Randomly chosing a card
+    chosen = random.choice(carded)
+    carded.remove(chosen)
 
-    print(cards[randomz].get_name())
+    print(cards[chosen].get_name())
 
     # If "update sanity"
-    if cards[randomz].get_effect()[0] == "update sanity":
-        players[player_id].update_sanity(cards[randomz].get_effect()[1])
+    if cards[chosen].get_effect()[0] == "update sanity":
         
-        if cards[randomz].get_effect()[1] < 0:
-            print ("Your sanity decreased by", cards[randomz].get_effect()[1], "sanity.")
-        elif cards[randomz].get_effect()[1] > 0:
-            print ("Your sanity increased by", cards[randomz].get_effect()[1], "sanity.")
+        # If card chosen decreases sanity
+        if cards[chosen].get_effect()[1] < 0:
+            
+            # If player does not have enough sanity to lose
+            if int(players[player_id].get_sanity()) < -cards[chosen.get_effect()[1]:
+                bankrupt(-cards[chosen].get_effect()[1], player_id, None)
+            else:
+                print ("Your sanity decreased by", -cards[chosen].get_effect()[1], "sanity.")
+
+        # If card chosen increases sanity
+        elif cards[chosen].get_effect()[1] > 0:
+            players[player_id].update_sanity(cards[chosen].get_effect()[1])
+            print ("Your sanity increased by", cards[chosen].get_effect()[1], "sanity.")
 
     # If "sanity for all"
-    elif cards[randomz].get_effect()[0] == "sanity for all":
+    elif cards[chosen].get_effect()[0] == "sanity for all":
         for i in range(len(players)):
-            players[i].update_sanity(cards[randomz].get_effect()[1])
+            players[i].update_sanity(cards[chosen].get_effect()[1])
     
     # If "birthday"
-    elif cards[randomz].get_effect()[0] == "birthday":
+    elif cards[chosen].get_effect()[0] == "birthday":
         for i in range(len(players)):
-            players[i].update_sanity(-cards[randomz].get_effect()[1])
-            players[player_id].update_sanity(cards[randomz].get_effect()[1])
+            players[player_id].update_sanity(cards[chosen].get_effect()[1])
+
+            # If player does not have enough sanity to lose
+            if int(players[i].get_sanity()) < cards[chosen.get_effect()[1]:
+                bankrupt(cards[chosen].get_effect()[1], i, None)
+            else:
+                players[i].update_sanity(cards[chosen].get_effect()[1])
         
     # If "jail"
-    elif cards[randomz].get_effect()[0] == "go to jail":
+    elif cards[chosen].get_effect()[0] == "go to jail":
         jail(player_id)
         
     # If "roll"
-    elif cards[randomz].get_effect()[0] == "roll double":
+    elif cards[chosen].get_effect()[0] == "roll double":
         input("Press 'Enter' to roll.")
         
         dice1, dice2 = roll()
@@ -318,16 +331,23 @@ def chance(player_id):
         print("\n")
         
         if dice1 == dice2:
-            players[player_id].update_sanity(cards[randomz].get_effect()[1])
-            print ("You gobled down your caifan like a vaccum cleaner...\n...\nbut you are fine!")
-            print ("Your sanity increased by", card[randomz].get_effect()[1], "sanity")
+            players[player_id].update_sanity(cards[chosen].get_effect()[1])
+            print ("You gobbled down your caifan like a vaccum cleaner...\n...\nbut you are fine!")
+            print ("Your sanity increased by", card[chosen].get_effect()[1], "sanity.")
+        
         else:
-            players[player_id].update_sanity(-cards[randomz].get_effect()[1])
-            print ("You gobled down your caifan like a vaccum cleaner...\n...\nand got food poisoning!")
-            print ("Your sanity decreased by", cards[randomz].get_effect()[1], "sanity.")
+            
+            # If player does not have enough sanity to lose
+            if int(players[player_id].get_sanity()) < cards[chosen.get_effect()[1]:
+                bankrupt(cards[chosen].get_effect()[1], player_id, None)    
+                 
+            else:  
+                players[player_id].update_sanity(-cards[chosen].get_effect()[1])
+                print ("You gobbled down your caifan like a vaccum cleaner...\n...\nand got food poisoning!")
+                print ("Your sanity decreased by", cards[chosen].get_effect()[1], "sanity.")
     
     # If "lose property"
-    elif cards[randomz].get_effect()[0] == "lose a property":     
+    elif cards[chosen].get_effect()[0] == "lose a property":     
         
         owned_building = []
         lose_building = []
