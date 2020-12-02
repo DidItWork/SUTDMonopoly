@@ -615,11 +615,9 @@ def gameround(player_id):
             return
         else:
             print("Some error occurred.")
-            
-
         
-    
-    # return board
+        update_board()
+        
     pass
 
 # Initialize variables and players
@@ -813,11 +811,7 @@ def initUI():
         playerIDs[i] = player 
         
     widg.pack() #Geometry setter
-    print("UI Initialised")
-    
-        
-        
-                
+
 def update_board():
     for key in priceIDs:
         widg.itemconfigure(priceIDs[key], text = tiles[key].get_building().get_rent())
