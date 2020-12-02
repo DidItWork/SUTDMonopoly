@@ -370,7 +370,7 @@ def chance(player_id):
             if tiles[i].get_building().get_owner() == players[player_id]:
                 owned_building.append(i)
                 owned_building.append(tiles[i].get_building().get_name())
-                owned_building.append(tiles[i].get_building().get_cost())
+                owned_building.append(tiles[i].get_building().get_cost(tiles[i].get_building().get_level()))
                 
                 lose_building.append(owned_building[:])
                 owned_building = []
