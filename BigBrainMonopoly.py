@@ -383,18 +383,18 @@ def chance(player_id):
         # If player owns building, give an option to choose a building to sell
         else: 
             print("Index", "Name", "Value")
-                for index, value in enumerate(lose_building):
-                    print(index + 1, value[1], value[2])
+            for index, value in enumerate(lose_building):
+                print(index + 1, value[1], value[2])
 
-              while lose < 1 or lose > len(lose_building) + 1:
-                    lose = int(input("Choose building index to lose: 1 to %s: " % len(lose_building)))
-                    try:
-                        lose = int(lose)
-                    except:
-                        lose = 0
+            while lose < 1 or lose > len(lose_building) + 1:
+                  lose = int(input("Choose building index to lose: 1 to %s: " % len(lose_building)))
+                  try:
+                      lose = int(lose)
+                  except:
+                      lose = 0
 
-              tiles[lose_building[lose - 1][0]].get_building().set_ownership(None)
-              print("Your have lost ownership of", lose_building[lose - 1][1])
+            tiles[lose_building[lose - 1][0]].get_building().set_ownership(None)
+            print("Your have lost ownership of", lose_building[lose - 1][1])
         pass
     
 def pay_rent(from_player, to_player, amount):
