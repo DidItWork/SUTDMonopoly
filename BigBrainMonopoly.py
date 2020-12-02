@@ -327,7 +327,7 @@ def chance(player_id):
             players[player_id].update_sanity(cards[chosen].get_effect()[1])
 
             # If player does not have enough sanity to lose
-            if int(players[i].get_sanity()) < cards[chosen.get_effect()[1]:
+            if int(players[i].get_sanity()) < cards[chosen].get_effect()[1]:
                 bankrupt(cards[chosen].get_effect()[1], i, None)
             else:
                 players[i].update_sanity(cards[chosen].get_effect()[1])
@@ -353,10 +353,9 @@ def chance(player_id):
         else:
             
             # If player does not have enough sanity to lose
-            if int(players[player_id].get_sanity()) < cards[chosen.get_effect()[1]:
-                bankrupt(cards[chosen].get_effect()[1], player_id, None)    
-                 
-            else:  
+            if int(players[player_id].get_sanity()) < cards[chosen].get_effect()[1]:
+                bankrupt(cards[chosen].get_effect()[1], player_id, None)
+            else:                     
                 players[player_id].update_sanity(-cards[chosen].get_effect()[1])
                 print ("You gobbled down your caifan like a vaccum cleaner...\n...\nand got food poisoning!")
                 print ("Your sanity decreased by", cards[chosen].get_effect()[1], "sanity.")
