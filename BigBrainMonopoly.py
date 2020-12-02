@@ -78,6 +78,28 @@ building_info = ["home",
                 ["name22", "truncated22", [100, 200, 300]],
                 ["name23", "truncated23", [100, 200, 300]]]
 
+boxLength = 100
+boxHeight = 130
+smolBoxHt = 90
+rot = [270, 180, 90, 0]
+
+cornerPos = num_of_tiles/4
+cornerXYs = [[boxHeight+5*boxLength, boxHeight+5*boxLength, 2*boxHeight+ 5*boxLength, 2*boxHeight+ 5*boxLength], 
+             [0, boxHeight+5*boxLength, boxHeight, 2*boxHeight+5*boxLength],
+             [0,0,boxHeight,boxHeight],
+             [boxHeight+5*boxLength,0,2*boxHeight+5*boxLength,boxHeight]] #hardcoded corners
+boardDimensionY = 2*(boxHeight) + (7-2)*(boxLength)
+
+playerCols = ['green', 'blue', 'red', "magenta", "black"]
+playerPos = [[682.5, 687.5, 687.5, 692.5], 
+             [692.5, 687.5, 697.5, 692.5], 
+             [702.5, 687.5, 707.5, 692.5],
+             [687.5, 697.5, 692.5, 702.5], 
+             [697.5, 697.5, 702.5, 702.5]]
+
+top = tkinter.Tk()
+widg = tkinter.Canvas(top, bg = "black", height = boardDimensionY, width = boardDimensionY)
+
 # Defining classes of objects
 #-------------------------------------------------------------------------#
 class player():
@@ -217,6 +239,42 @@ class card():
     def get_effect(self):
         return self.__effect
     
+# GUI-Related Functions
+#-------------------------------------------------------------------------#
+def avg(coordLs, xy):
+    if xy == "x":
+        mean = (coordLs[0]+coordLs[2])/2
+    elif xy == 'y':
+        mean = (coordLs[1]+coordLs[3])/2
+    else:
+        return None
+    return mean
+        
+
+def getProperties(coord, ori, thisId):
+    
+    centre = [avg(coord, 'x'), avg(coord, 'y')]
+    smolBox = coord.copy()
+    if(type(ori) is int): #Normal tile (not corner)
+        smolBox[ori] += ((-1)**(ori < 0))*smolBoxHt
+        namePos = [avg(smolBox, 'x') , avg(smolBox, 'y')]
+        textRot = rot[ori]
+        
+        if (ori%2 == 0):
+            bottom = [((-1)**(ori < 0))*10+coord[ori], avg(coord, 'y')]
+            ownerPos = [((-1)**(ori >= 0))*30+namePos[0], namePos[1]]
+        else:
+            bottom = [avg(coord, 'x'), ((-1)**(ori < 0))*10+coord[ori]]
+            ownerPos = [namePos[0], ((-1)**(ori >= 0))*30+namePos[1]]
+    else: #If it's a corner
+        smolBox[-1] -= boxHeight-smolBoxHt
+        smolBox[0] += boxHeight-smolBoxHt
+        bottom = None
+        textRot = None
+        namePos = [avg(smolBox, 'x') , avg(smolBox, 'y')]
+        ownerPos = None
+    return (thisId, smolBox, centre, bottom, namePos, ownerPos, textRot) 
+    
 # Game functions
 #-------------------------------------------------------------------------#
 def roll():
@@ -305,7 +363,7 @@ def chance(player_id):
     # If "lose property"
     elif cards[randomz].get_effect()[0] == "lose a property":     
         
-        own_building = []
+        owned_building = []
         lose_building = []
         
         for i in building_pos:
@@ -329,7 +387,7 @@ def chance(player_id):
             print(index + 1, value[1], value[2])
           lose = int(input("Choose building index to lose: 1 to %s: " % len(lose_building)))
           tiles[lose_building[lose -1][0]].get_building().set_ownership(None)
-          print("Your have lost ownership of", lose_building[lose -1][1]]
+          print("Your have lost ownership of", lose_building[lose -1][1])
         
         """
         This block is quite complicated by the way lol
@@ -570,8 +628,8 @@ def gameround(player_id):
         else:
             print("Some error occurred.")
             
-        update_board()
-        display_board()
+
+        
     
     # return board
     pass
@@ -603,20 +661,21 @@ def game():
                 break
             else:
                 print("Name already exist! Please Reenter name.")
-    
+    initUI()
     counter = 0
     while num_players != 1:
         print("\nIt's %s's turn." % (players[counter].get_name()))
-        
+                
         if players[counter].get_status() == "Jail":
             jail_turn(counter)
         
         if players[counter].get_status() == "Normal":
             gameround(counter)
-            
+        update_board()    
         #Cycling between players
         counter += 1
         counter = counter % num_players
+    top.mainloop()
     
     # When there's only 1 player left, announce winner of the game
     winner = ""
@@ -680,13 +739,133 @@ def render_game():
     
 # GUI/Board functions
 #-------------------------------------------------------------------------#
-def update_board():
-    # Incomplete
-    pass
+priceIDs = {}
+ownedIDs = {}
+playerIDs = {}
 
-def display_board():    
-    # Incomplete
+def initUI():    
+    
+    top.title("SUTD-opoly")
+    
+    funkyBoxThings = {}
+    x_i = 0
+    y_i = 0
+    for i in range(num_of_tiles):
+        if i == 0 or i % (cornerPos) == 0:
+            coords = cornerXYs[int(i//cornerPos)]
+            x_i = coords[0]
+            y_i = coords[1]
+            if(i//cornerPos == 2):
+                x_i += boxHeight
+            if(i//cornerPos == 3):
+                y_i += boxHeight
+            myid = widg.create_rectangle(coords, fill = 'white', outline = 'black')
+            funkyBoxThings[i] = getProperties(coords, 'c', myid) #corners
+        elif i > 0 and i < cornerPos:
+            x_i -= boxLength
+            coords = [x_i, y_i, x_i+boxLength, y_i+boxHeight]
+            myid = widg.create_rectangle(coords, fill = 'white', outline = 'black')
+            funkyBoxThings[i] = getProperties(coords, -1, myid) #bottom row
+        elif i > cornerPos and i < 2*cornerPos:
+            y_i -= boxLength
+            coords = [x_i, y_i, x_i+boxHeight, y_i+boxLength]
+            myid = widg.create_rectangle(coords, fill = 'white', outline = 'black')
+            funkyBoxThings[i] = getProperties(coords, 0, myid) #left row
+        elif i > 2*cornerPos and i < 3*cornerPos:
+            coords = [x_i, y_i, x_i+boxLength, y_i+boxHeight]
+            x_i += boxLength
+            myid = widg.create_rectangle(coords, fill = 'white', outline = 'black')
+            funkyBoxThings[i] = getProperties(coords, 1, myid) #top row
+            
+        elif i > 3*cornerPos:
+            coords = [x_i, y_i, x_i+boxHeight, y_i+boxLength]
+            y_i += boxLength
+            myid = widg.create_rectangle(coords, fill = 'white', outline = 'black')
+            funkyBoxThings[i] = getProperties(coords, -2, myid) #right row
+            
+    n = False
+    c = 0        
+    colours = ["#CBAACB", "#F0F8FF", "#FEE1E8", "#FFD8BE", "#FF968A", "#FFFFB5", "#CCE2CB","#ABDEE6"]
+    for i in range(24):
+        decor = funkyBoxThings[i]
+        if i in building_pos:
+            
+            myid = widg.create_rectangle(decor[1], outline = 'black', fill = colours[c]) #small rectangle colour setting
+            if not n:
+                n = True
+            else:
+                c+=1
+                n=False
+            
+            owner = tiles[i].get_building().get_owner()
+            if owner == None:
+                owner = "---"
+            
+            widg.create_text(decor[4], text = tiles[i].get_building().get_truncated(), angle = decor[6])
+            priceIDs[i] = widg.create_text(decor[3], text = int(tiles[i].get_building().get_rent()), angle = decor[6])
+            ownedIDs[i] = widg.create_text(decor[5], text = owner, angle = decor[6])
+            
+        elif i == go_pos:
+            widg.create_text(decor[2], text = 'GO!', angle = 45) 
+        elif i == jail_pos:
+            widg.create_rectangle(decor[1], outline = 'black', fill = '#FFA700')
+        elif i in tax_pos:
+            widg.create_text(decor[2], text = "TAX\n\n{:d} SAN".format(tax_pos[i]), angle = decor[6]) 
+        elif i in chance_pos:
+            widg.create_text(decor[2], text = "?", angle = decor[6])
+            widg.create_text(decor[3], text = "CHANCE", angle = decor[6])
+        elif i == freeParking_pos:
+            widg.create_text(decor[2], text = "FREE\nPARKING", angle = 225)
+        elif i == goToJail_pos:
+            widg.create_text(decor[2], text = "GO TO\nJAIL", angle = 135)
+    for i in range(num_players):
+        player = widg.create_rectangle(playerPos[i], fill=playerCols[i])
+        playerIDs[i] = player 
+        
+    widg.pack() #Geometry setter
+    print("UI Initialised")
+    
+        
+        
+                
+def update_board():
+    for key in priceIDs:
+        widg.itemconfigure(priceIDs[key], text = tiles[key].get_building().get_rent())
+        widg.itemconfigure(ownedIDs[key], text = tiles[key].get_building().get_owner())
+    for key in playerIDs:
+        position = players[key].get_position()
+        status = players[key].get_status()
+        pos = [avg(playerPos[key], 'x'), avg(playerPos[key], 'y')]
+        if status == 'Bankrupt':
+            widg.delete(playerIDs[key])
+            playerIDs.pop(key)
+        elif status == 'jail':
+            pos = [0,0]
+            widg.moveto(playerIDs[key], pos[0], pos[1])
+        else:
+            if position == 0:
+                pass
+            elif position > 0 and position < 6:
+                pos[0] -= (position-1)*boxLength + boxHeight
+                
+            elif position == 6:
+                pos = [0,0] #placeholder for jail
+            elif position > 6 and position <= 12:
+                pos[0] -= 5*boxLength + boxHeight
+                pos[1] -= (position-7)*boxLength + boxHeight
+            elif position > 12 and position < 18:
+                pos[0] -= (17 - position)*boxLength + boxHeight
+                pos[1] -= 5*boxLength + boxHeight
+            elif position == 18:
+                pos = [0,0] #placeholder for Jail
+            elif position > 18:
+                pos[1] -= (23 - position)*boxLength + boxHeight
+            widg.moveto(playerIDs[key], pos[0], pos[1])
+    
+    print("Updating")
+    return
     pass
 
 #Run the game
 game()
+#putting mainloop here doesn't work
