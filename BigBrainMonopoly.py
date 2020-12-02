@@ -165,7 +165,7 @@ class building():
     
     def get_cost(self, *level):
         cost = 0
-    
+
         if len(level) == 0:  
             if self.__level == 0:
                 return self.__cost[0]
@@ -286,7 +286,6 @@ def chance(player_id):
         
     # If "roll"
     elif cards[randomz].get_effect()[0] == "roll double":
-        
         input("Press 'Enter' to roll.")
         
         dice1, dice2 = roll()
@@ -296,56 +295,52 @@ def chance(player_id):
         if dice1 == dice2:
             players[player_id].update_sanity(cards[randomz].get_effect()[1])
             print ("You gobled down your caifan like a vaccum cleaner. But you are fine!")
-            print ("Your sanity increased by", card[randomz].get_effect()[1])
+            print ("Your sanity increased by", card[randomz].get_effect()[1], "sanity")
         else:
             players[player_id].update_sanity(-cards[randomz].get_effect()[1])
             print ("You gobled down your caifan like a vaccum cleaner and got food poisoning!")
-            print ("Your sanity decreased by", cards[randomz].get_effect()[1], "sanity")
+            print ("Your sanity decreased by", cards[randomz].get_effect()[1], "sanity.")
     
     # If "lose property"
     elif cards[randomz].get_effect()[0] == "lose a property":     
         
-        own_building = []
+        owned_building = []
         lose_building = []
+        lose = 0
         
         for i in building_pos:
-          if tiles[i].get_building().get_owner() == players[player_id]:
-            owned_building.append(i)
-            owned_building.append(tiles[i].get_building().get_name())
-            owned_building.append(tiles[i].get_building().get_cost())
-            
-            lose_building.append(owned_building[:])
-            owned_building = []
+            if tiles[i].get_building().get_owner() == players[player_id]:
+                owned_building.append(i)
+                owned_building.append(tiles[i].get_building().get_name())
+                owned_building.append(tiles[i].get_building().get_cost())
+                
+                lose_building.append(owned_building[:])
+                owned_building = []
             
          # If player owns no building, teleport them to jail
         if len(lose_building) == 0:
-          print("You have no property to lose. You are going to JAIL!!")
-          jail(player_id)
-          
+            print("You have no property to lose. You are going to JAIL!!")
+            jail(player_id)
+            
         # If player owns building, give an option to choose a building to sell
         else: 
-          print("Index", "Name", "Value")
-          for index, value in enumerate(lose_building):
-            print(index + 1, value[1], value[2])
-          lose = int(input("Choose building index to lose: 1 to %s: " % len(lose_building)))
-          tiles[lose_building[lose -1][0]].get_building().set_ownership(None)
-          print("Your have lost ownership of", lose_building[lose -1][1]]
-        
-        """
-        This block is quite complicated by the way lol
-        
-        Try to analyze the 'pay rent' function below, it shows how to traverse
-        the property and provide the option of choosing which property to sell
-        
-        Try reading the comments below so that you can understand the code better
-        
-        Just feel free to ask me if you have any question yeah
-        """
-        
+            print("Index", "Name", "Value")
+            for index, value in enumerate(lose_building):
+                print(index + 1, value[1], value[2])
+                
+            while lose < 1 or lose > len(lose_building) + 1:
+                lose = int(input("Choose building index to lose: 1 to %s: " % len(lose_building)))
+                try:
+                    lose = int(lose)
+                except:
+                    lose = 0
+                    
+            tiles[lose_building[lose - 1][0]].get_building().set_ownership(None)
+            print("Your have lost ownership of", lose_building[lose - 1][1])
         pass
     
 def pay_rent(from_player, to_player, amount):
-    print("Rent time!")
+    print("\nRent time!")
     print(f"Pay {amount} sanity to {names[to_player]}.")
     
     """
@@ -373,6 +368,41 @@ def pay_rent(from_player, to_player, amount):
     print("Payer %s : " % names[from_player], players[from_player].get_sanity())
     print("Landlord %s : " % names[to_player], players[to_player].get_sanity())
     """
+    
+    bankrupt(amount, from_player, to_player)
+    pass
+
+def upgrade_building(active_building, player):
+    buy = "z"
+    while buy[0] not in "yYnN":
+        buy = input("Do you want to upgrade %s to Level %s , cost: %s sanity [y/n]? " 
+                     % (active_building.get_name(), 
+                        active_building.get_level() + 2, 
+                        active_building.get_cost(active_building.get_level() + 1)))
+        if buy == "":
+            buy = "z"
+        
+    if buy[0] in "yY":
+        active_building.level_up()
+        player.update_sanity(-active_building.get_cost())
+        print("Building owned by:",names[active_building.get_owner()])
+    pass
+
+def buy_building(player, player_id, active_building):
+    buy = "z"
+    while buy[0] not in "yYnN":
+        buy = input(("Do you want to buy %s, cost: %s sanity [y/n]? " % (active_building.get_name(), active_building.get_cost())))
+        if buy == "":
+            buy = "z"
+        
+    if buy[0] in "yY":
+        active_building.set_ownership(player_id)
+        player.update_sanity(-active_building.get_cost())
+        print(f"{active_building.get_name()} is now owned by: {names[active_building.get_owner()]}")
+    pass
+
+def bankrupt(amount, from_player, to_player):
+    print(f"{names[from_player]} is out of sanity!")
     
     # Initialize some local variables for later
     sell = 0
@@ -413,7 +443,7 @@ def pay_rent(from_player, to_player, amount):
             print("Index", "Name", "Value")
             for index, value in enumerate(sell_building):
                 print(index + 1, value[1], value[2])
-          
+
             while sell < 1 or sell > len(sell_building) + 1:
                 sell = input("Choose building index to sell 1 to %s: " % len(sell_building))
                 try:
@@ -436,38 +466,6 @@ def pay_rent(from_player, to_player, amount):
                 print("bAnKrUpT g3t g00d n00b")
                 players[from_player].update_status("Bankrupt")
                 return
-    pass
-
-def upgrade_building(active_building, player):
-    buy = "z"
-    while buy[0] not in "yYnN":
-        buy = input("Do you want to upgrade %s to Level %s , cost: %s sanity [y/n]? " 
-                     % (active_building.get_name(), 
-                        active_building.get_level() + 2, 
-                        active_building.get_cost(active_building.get_level() + 1)))
-        if buy == "":
-            buy = "z"
-        
-    if buy[0] in "yY":
-        active_building.level_up()
-        player.update_sanity(-active_building.get_cost())
-        print("Building owned by:",names[active_building.get_owner()])
-    pass
-
-def buy_building(player, player_id, active_building):
-    buy = "z"
-    while buy[0] not in "yYnN":
-        buy = input(("Do you want to buy %s, cost: %s sanity [y/n]? " % (active_building.get_name(), active_building.get_cost())))
-        if buy == "":
-            buy = "z"
-        
-    if buy[0] in "yY":
-        active_building.set_ownership(player_id)
-        player.update_sanity(-active_building.get_cost())
-        print(f"{active_building.get_name()} is now owned by: {names[active_building.get_owner()]}")
-    pass
-
-def bankrupt(player_id):
     pass
 
 def jail_turn(player_id):
@@ -526,7 +524,7 @@ def gameround(player_id):
         if tiles[player_pos].get_type()=="building":
             active_building = tiles[player_pos].get_building()
             
-            print(f"You landed on {tiles[player_pos].get_building().get_name()}.")
+            print(f"You landed on {tiles[player_pos].get_building().get_name()}.\n")
         
             # If tile is empty and can afford
             if active_building.get_owner() == None and active_building.get_cost() <= player.get_sanity():
