@@ -87,20 +87,35 @@ rot = [270, 180, 90, 0]
 priceIDs = {}
 ownedIDs = {}
 playerIDs = {}
+sanCounter = []
+guideBoxes = []
+
+dicePips1 = []
+dicePips2 = []
 
 cornerPos = num_of_tiles/4
 cornerXYs = [[boxHeight+5*boxLength, boxHeight+5*boxLength, 2*boxHeight+ 5*boxLength, 2*boxHeight+ 5*boxLength], 
              [0, boxHeight+5*boxLength, boxHeight, 2*boxHeight+5*boxLength],
              [0,0,boxHeight,boxHeight],
              [boxHeight+5*boxLength,0,2*boxHeight+5*boxLength,boxHeight]] #hardcoded corners
+centreGo = [(cornerXYs[0][0]+cornerXYs[0][2])/2 + 7.5, (cornerXYs[0][1]+cornerXYs[0][3])/2 + 7.5]
 boardDimensionY = 2*(boxHeight) + (7-2)*(boxLength)
 
-playerCols = ['green', 'blue', 'red', "magenta", "black"]
-playerPos = [[682.5, 687.5, 687.5, 692.5], 
-             [692.5, 687.5, 697.5, 692.5], 
-             [702.5, 687.5, 707.5, 692.5],
-             [687.5, 697.5, 692.5, 702.5], 
-             [697.5, 697.5, 702.5, 702.5]]
+diceMaps = [[0,0,0,1,0,0,0],
+            [1,0,0,0,0,0,1],
+            [1,0,0,1,0,0,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,1,0,1,1],
+            [1,1,1,0,1,1,1]]
+
+playerCols = ['green', 'blue', 'red', "magenta", "cyan"]
+playerPos = [centreGo, 
+             [centreGo[0]+20, centreGo[1]+20],
+             [centreGo[0]-20, centreGo[1]+20],
+             [centreGo[0]+20, centreGo[1]-20],
+             [centreGo[0]-20, centreGo[1]-20]]
+inJail = []
+justVisiting = []
 
 top = tkinter.Tk()
 widg = tkinter.Canvas(top, bg = "black", height = boardDimensionY, width = boardDimensionY)
@@ -532,7 +547,7 @@ def gameround(player_id):
         
         player.update_position(step)
         
-        update_board()
+        update_board(player_id, dice1, dice2)
         
         player_pos = player.get_position()
         # print("Player position:", player_pos, "\n")
@@ -584,7 +599,7 @@ def gameround(player_id):
         else:
             print("Some error occurred.")
         
-        update_board()
+        update_board(player_id, dice1, dice2)
         
     pass
 
@@ -770,54 +785,149 @@ def initUI():
             widg.create_text(decor[2], text = 'GO!', angle = 45) 
         elif i == jail_pos:
             widg.create_rectangle(decor[1], outline = 'black', fill = '#FFA700')
+            centre = [avg(decor[1], 'x'), avg(decor[1], 'y')]
+            widg.create_text(centre, text = "JAIL", angle = 315)
+            niceCorner = [centre[0]-65, centre[1]+65]
+            for i in range(0, 9, 2):
+                if i == 0:
+                    inJail.append(centre)
+                    justVisiting.append(niceCorner)
+                else:
+                    jailSpaceX = centre[0] - ((-1)**(not i%3 == 2))*17.5
+                    jailSpaceY = centre[1] - ((-1)**(i > 5))*17.5
+                    inJail.append([jailSpaceX, jailSpaceY])
+                    visitSpaceX = niceCorner[0] + (i > 5)*(2**(i > 7))*30
+                    visitSpaceY = niceCorner[1] - (i < 5)*(2**(i > 3))*30
+                    justVisiting.append([visitSpaceX, visitSpaceY])
+            
         elif i in tax_pos:
-            widg.create_text(decor[2], text = "TAX\n\n{:d} SAN".format(tax_pos[i]), angle = decor[6]) 
+            widg.create_text(decor[2], text = "TAX\n \n{:d} \nSANITY".format(tax_pos[i]), angle = decor[6], justify = tkinter.CENTER) 
         elif i in chance_pos:
             widg.create_text(decor[2], text = "?", angle = decor[6])
-            widg.create_text(decor[3], text = "CHANCE", angle = decor[6])
+            widg.create_text(decor[4], text = "CHANCE", angle = decor[6])
         elif i == freeParking_pos:
-            widg.create_text(decor[2], text = "FREE\nPARKING", angle = 225)
+            widg.create_text(decor[2], text = "FREE\nPARKING", angle = 225, justify = tkinter.CENTER)
         elif i == goToJail_pos:
-            widg.create_text(decor[2], text = "GO TO\nJAIL", angle = 135)
-    for i in range(num_players):
-        player = widg.create_rectangle(playerPos[i], fill=playerCols[i])
-        playerIDs[i] = player 
+            widg.create_text(decor[2], text = "GO TO\nJAIL", angle = 135, justify = tkinter.CENTER)
+            
+    #create guiding boxes for legend
+    for i in range(2): 
+        for r in range(3):
+            boxRI = [(boxHeight+10)+160*r, (boardDimensionY/2 + 50*(i+1)), (boxHeight+10)+160*(r+1), (boardDimensionY/2) + 50*(i+2)]
+            guideBoxes.append(boxRI)
+    tileTitleGuide = [boxHeight+boxLength, boxHeight+(boxLength/4)]
+    tileGuide = [boxHeight+boxLength-40, boxHeight+(boxLength/4) + 10]
+    
+    #initialise DICE 
+    diceMid = []
+    dice = []
+    pips1 = []
+    pips2 = []
+    for i in range(2):
+        diceMid.append([boxHeight+(3.5+i)*boxLength, boxHeight+(0.5+i)*boxLength])
+    for i in diceMid:
+        dice.append([i[0]-45, i[1]-45, i[0]+45, i[1]+45])
+    for i in range(len(dice)):
+        widg.create_rectangle(dice[i], outline = "white")
+        if i == 0:
+            pips = pips1
+        else:
+            pips = pips2
+        for r in range(3):
+            for n in range(3):
+                x0 = dice[i][0]+ 13.5*(n+1) + 12*n
+                y0 = dice[i][1]+ 13.5*(r+1) + 12*r
+                pips.append([x0, y0, x0+12, y0+12])
+        pips.pop(1)
+        pips.pop(6)
+        
+    #initialise pips of first and second dice
+    for i in pips1:
+        dicePips1.append(widg.create_oval(i, fill = 'white', disabledfill = 'black', state = tkinter.DISABLED))
+    
+    for i in pips2:
+        dicePips2.append(widg.create_oval(i, fill = 'white', disabledfill = 'black', state = tkinter.DISABLED))
+    
+    #initialise tokens and player guide
+    for i in range(num_players): 
+        playerIDs[i] = makeToken(playerPos[i], playerCols[i])
+        nama = players[i].get_name()
+        startingCash = players[i].get_sanity()
+        
+        legend = guideBoxes[i][0:2]
+        for r in range(2):
+            legend[r] += 10
+            legend.append(legend[r]+30)
+            
+        widg.create_rectangle(legend, fill = playerCols[i])
+        widg.create_text(legend[2]+3, legend[1], text = "{:6s}".format(nama), anchor = tkinter.NW, fill = "white")
+        sanCounter.append(widg.create_text(legend[2]+3, legend[3], text = "Sanity: {:d}".format(startingCash), anchor = tkinter.SW, fill = "white"))
+        
+    #current tile checker initialisation
+    widg.create_text(tileTitleGuide, text="Current Tile", fill = 'white')
+    global guide
+    guide = widg.create_text(tileGuide, text = "Name:\nOwner:\nLevel:\nRent:", anchor = tkinter.NW, fill = 'white')
         
     widg.pack() #Geometry setter
 
-def update_board():
+def update_board(myTurn, d1, d2):
     for key in priceIDs:
-        widg.itemconfigure(priceIDs[key], text = tiles[key].get_building().get_rent())
-        widg.itemconfigure(ownedIDs[key], text = tiles[key].get_building().get_owner())
+        owner = tiles[key].get_building().get_owner()
+        if owner == None:
+            owner = "---"
+        else:
+            owner = players[owner].get_name()
+        widg.itemconfigure(priceIDs[key], text = int(tiles[key].get_building().get_rent()))
+        widg.itemconfigure(ownedIDs[key], text = owner)
     for key in playerIDs:
         position = players[key].get_position()
         status = players[key].get_status()
-        pos = [avg(playerPos[key], 'x'), avg(playerPos[key], 'y')]
+        pos = playerPos[key].copy()
+        san = int(players[key].get_sanity())
         if status == 'Bankrupt':
             widg.delete(playerIDs[key])
             playerIDs.pop(key)
-        elif status == 'jail':
-            pos = [0,0]
-            widg.moveto(playerIDs[key], pos[0], pos[1])
+            san = "BANKRUPT!"
+        elif status == 'Jail':
+            pos = inJail[key].copy()
+            widg.moveto(playerIDs[key], pos[0]-10, pos[1]-10)
         else:
             if position == 0:
                 pass
             elif position > 0 and position < 6:
-                pos[0] -= (position-1)*boxLength + boxHeight
-                
+                pos[0] -= (position-1)*boxLength + boxHeight + 7.5
             elif position == 6:
-                pos = [0,0] #placeholder for jail
+                pos = justVisiting[key].copy() #placeholder for jail
             elif position > 6 and position <= 12:
-                pos[0] -= 5*boxLength + boxHeight
-                pos[1] -= (position-7)*boxLength + boxHeight
+                pos[0] -= 5*boxLength + boxHeight + 30
+                pos[1] -= (position-7)*boxLength + boxHeight -7.5
             elif position > 12 and position < 18:
                 pos[0] -= (17 - position)*boxLength + boxHeight
-                pos[1] -= 5*boxLength + boxHeight
+                pos[1] -= 5*boxLength + boxHeight + 30
             elif position == 18:
-                pos = [0,0] #placeholder for Jail
+                pos = inJail[key].copy() #placeholder for Jail
             elif position > 18:
-                pos[1] -= (23 - position)*boxLength + boxHeight
-            widg.moveto(playerIDs[key], pos[0], pos[1])
+                pos[1] -= (23 - position)*boxLength + boxHeight + 15
+            widg.moveto(playerIDs[key], pos[0]-10, pos[1]-10)
+        
+        widg.itemconfigure(sanCounter[key], text = "Sanity: {}".format(san))
+        building_of_note = players[myTurn].get_position()
+        if building_of_note in building_pos:
+            print("tracking...")
+            b = tiles[building_of_note].get_building()
+            own = b.get_owner()
+            if own == None:
+                own = "---"
+            else:
+                own = players[own].get_name()
+            tileData = "Name: {}\nOwner: {}\nLevel: {}\nRent: {}".format(b.get_name(), own, b.get_level(), b.get_rent())
+        else:
+            tileData = "Name:\nOwner:\nLevel:\nRent:"
+        widg.itemconfigure(guide, text = tileData)
+        
+        #display dice roll
+        setDice(d1, dicePips1)
+        setDice(d2, dicePips2)
     return
     pass
 
@@ -829,6 +939,11 @@ def avg(coordLs, xy):
     else:
         return None
     return mean
+
+def makeToken(startPos, colour):
+    coords = [startPos[0]+10, startPos[1]+10, startPos[0]-10, startPos[1]-10]
+    token = widg.create_rectangle(coords, fill=colour, outline = colour)
+    return token    
 
 def getProperties(coord, ori, thisId):
     
@@ -853,6 +968,13 @@ def getProperties(coord, ori, thisId):
         namePos = [avg(smolBox, 'x') , avg(smolBox, 'y')]
         ownerPos = None
     return (thisId, smolBox, centre, bottom, namePos, ownerPos, textRot) 
-    
+
+def setDice(roll, pips):
+    dMap = diceMaps[roll-1]
+    for pip in range(len(dMap)):
+        if dMap[pip] == 1:
+            widg.itemconfigure(pips[pip], state = tkinter.NORMAL)
+        else:
+            widg.itemconfigure(pips[pip], state = tkinter.DISABLED)
 #Run the game
 game()
