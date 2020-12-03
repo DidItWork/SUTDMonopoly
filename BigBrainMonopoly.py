@@ -903,7 +903,10 @@ def initUI():
         
     widg.pack() #Geometry setter
 
-def update_board(myTurn, d1, d2):
+def update_board(*args):
+    arGs = []
+    for arg in args:
+        arGs.append(arg)
     for key in priceIDs:
         owner = tiles[key].get_building().get_owner()
         if owner == None:
@@ -944,22 +947,23 @@ def update_board(myTurn, d1, d2):
             widg.moveto(playerIDs[key], pos[0]-10, pos[1]-10)
         
         widg.itemconfigure(sanCounter[key], text = "Sanity: {}".format(san))
-        building_of_note = players[myTurn].get_position()
-        if building_of_note in building_pos:
-            b = tiles[building_of_note].get_building()
-            own = b.get_owner()
-            if own == None:
-                own = "---"
+        if len(arGs) != 0:
+            building_of_note = players[arGs[0]].get_position()
+            if building_of_note in building_pos:
+                b = tiles[building_of_note].get_building()
+                own = b.get_owner()
+                if own == None:
+                    own = "---"
+                else:
+                    own = players[own].get_name()   
+                tileData = "Name: {}\nOwner: {}\nLevel: {}\nRent: {}".format(b.get_name(), own, b.get_level(), b.get_rent())
             else:
-                own = players[own].get_name()   
-            tileData = "Name: {}\nOwner: {}\nLevel: {}\nRent: {}".format(b.get_name(), own, b.get_level(), b.get_rent())
-        else:
-            tileData = "Name:\nOwner:\nLevel:\nRent:"
-        widg.itemconfigure(guide, text = tileData)
-        
-        #display dice roll
-        setDice(d1, dicePips1)
-        setDice(d2, dicePips2)
+                tileData = "Name:\nOwner:\nLevel:\nRent:"
+            widg.itemconfigure(guide, text = tileData)
+            
+            #display dice roll
+            setDice(arGs[1], dicePips1)
+            setDice(arGs[2], dicePips2)
     return
     pass
 
