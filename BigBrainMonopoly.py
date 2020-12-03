@@ -489,7 +489,7 @@ def bankrupt(amount, from_player, to_player):
             for index, value in enumerate(sell_building):
                 print(index + 1, value[1], value[2])
 
-            while sell < 1 or sell > len(sell_building) + 1:
+            while sell < 1 or sell > len(sell_building):
                 sell = input("Choose building index to sell 1 to %s: " % len(sell_building))
                 try:
                     sell = int(sell)
@@ -897,14 +897,14 @@ def update_board(myTurn, d1, d2):
             owner = players[owner].get_name()
         widg.itemconfigure(priceIDs[key], text = int(tiles[key].get_building().get_rent()))
         widg.itemconfigure(ownedIDs[key], text = owner)
-    for key in playerIDs:
+    playerIterations = playerIDs.copy()
+    for key in playerIterations:
         position = players[key].get_position()
         status = players[key].get_status()
         pos = playerPos[key].copy()
         san = int(players[key].get_sanity())
         if status == 'Bankrupt':
-            widg.delete(playerIDs[key])
-            playerIDs.pop(key)
+            widg.delete(playerIDs.pop(key))
             san = "BANKRUPT!"
         elif status == 'Jail':
             pos = inJail[key].copy()
