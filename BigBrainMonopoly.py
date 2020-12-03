@@ -262,6 +262,9 @@ def roll():
     #return a tuple of two integers (1-6) from dice rolls
     dice1 = random.randint(1, 6)
     dice2 = random.randint(1, 6)
+    print("Roll 1:", dice1)
+    print("Roll 2:", dice2)
+    print("\n")
     
     return dice1, dice2
 
@@ -306,9 +309,10 @@ def chance(player_id):
         if cards[chosen].get_effect()[1] < 0:
             
             # If player does not have enough sanity to lose
-            if int(players[player_id].get_sanity()) < -cards[chosen].get_effect()[1]:
+            if players[player_id].get_sanity() < -cards[chosen].get_effect()[1]:
                 bankrupt(-cards[chosen].get_effect()[1], player_id, None)
             else:
+                players[player_id].update_sanity(cards[chosen].get_effect()[1])
                 print ("Your sanity decreased by", -cards[chosen].get_effect()[1], "sanity.")
 
         # If card chosen increases sanity
@@ -324,13 +328,17 @@ def chance(player_id):
     # If "birthday"
     elif cards[chosen].get_effect()[0] == "birthday":
         for i in range(len(players)):
-            players[player_id].update_sanity(cards[chosen].get_effect()[1])
-
+            
+            if i == player_id:
+                continue
+            
             # If player does not have enough sanity to lose
-            if int(players[i].get_sanity()) < cards[chosen].get_effect()[1]:
-                bankrupt(cards[chosen].get_effect()[1], i, None)
+            elif players[i].get_sanity() < cards[chosen].get_effect()[1]:
+                bankrupt(cards[chosen].get_effect()[1], i, player_id)
+
             else:
-                players[i].update_sanity(cards[chosen].get_effect()[1])
+                players[player_id].update_sanity(cards[chosen].get_effect()[1])
+                players[i].update_sanity(-cards[chosen].get_effect()[1])
         
     # If "jail"
     elif cards[chosen].get_effect()[0] == "go to jail":
@@ -341,9 +349,6 @@ def chance(player_id):
         input("Press 'Enter' to roll.")
         
         dice1, dice2 = roll()
-        print("Roll 1:", dice1)
-        print("Roll 2:", dice2)
-        print("\n")
         
         if dice1 == dice2:
             players[player_id].update_sanity(cards[chosen].get_effect()[1])
@@ -353,7 +358,7 @@ def chance(player_id):
         else:
             
             # If player does not have enough sanity to lose
-            if int(players[player_id].get_sanity()) < cards[chosen].get_effect()[1]:
+            if players[player_id].get_sanity() < cards[chosen].get_effect()[1]:
                 bankrupt(cards[chosen].get_effect()[1], player_id, None)
             else:                     
                 players[player_id].update_sanity(-cards[chosen].get_effect()[1])
@@ -361,7 +366,7 @@ def chance(player_id):
                 print ("Your sanity decreased by", cards[chosen].get_effect()[1], "sanity.")
     
     # If "lose property"
-    elif cards[chosen].get_effect()[0] == "lose a property":     
+    elif cards[chosen].get_effect()[0] == "lose a property":
         
         owned_building = []
         lose_building = []
@@ -419,7 +424,7 @@ def pay_rent(from_player, to_player, amount):
     pass
 
 def upgrade_building(active_building, player):
-    buy = "z"
+    buy = "y"
     while buy[0] not in "yYnN":
         buy = input("Do you want to upgrade %s to Level %s , cost: %s sanity [y/n]? " 
                      % (active_building.get_name(), 
@@ -434,7 +439,7 @@ def upgrade_building(active_building, player):
     pass
 
 def buy_building(player, player_id, active_building):
-    buy = "z"
+    buy = "y"
     while buy[0] not in "yYnN":
         buy = input(("Do you want to buy %s, cost: %s sanity [y/n]? " % (active_building.get_name(), active_building.get_cost())))
         if buy == "":
@@ -450,7 +455,7 @@ def bankrupt(amount, from_player, to_player):
     print(f"{names[from_player]} is out of sanity!")
     
     # Initialize some local variables for later
-    sell = 2
+    sell = 1
     total_cost = 0
     sell_building = []
     owned_building = []
@@ -489,7 +494,7 @@ def bankrupt(amount, from_player, to_player):
             for index, value in enumerate(sell_building):
                 print(index + 1, value[1], value[2])
 
-            while sell < 1 or sell > len(sell_building):
+            while sell < 1 or sell > len(sell_building) + 1:
                 sell = input("Choose building index to sell 1 to %s: " % len(sell_building))
                 try:
                     sell = int(sell)
@@ -518,9 +523,6 @@ def jail_turn(player_id):
         input("Roll a double to break out of jail! Press 'Enter' to roll.")
         dice1, dice2 = roll()
         
-        print(f"Roll 1: {dice1}")
-        print(f"Roll 2: {dice2}")
-        
         if dice1 == dice2:
             players[player_id].update_status("Normal")
             print("PRISON BREAK!!!")
@@ -546,8 +548,7 @@ def gameround(player_id):
         input("\nPress 'Enter' to roll.")
         
         dice1, dice2 = roll()
-        print("Roll 1:", dice1)
-        print("Roll 2:", dice2)
+        
         step = dice1 + dice2
         
         # Counter for doubles, maximum of 3 doubles in a row
@@ -897,14 +898,14 @@ def update_board(myTurn, d1, d2):
             owner = players[owner].get_name()
         widg.itemconfigure(priceIDs[key], text = int(tiles[key].get_building().get_rent()))
         widg.itemconfigure(ownedIDs[key], text = owner)
-    playerIterations = playerIDs.copy()
-    for key in playerIterations:
+    for key in playerIDs:
         position = players[key].get_position()
         status = players[key].get_status()
         pos = playerPos[key].copy()
         san = int(players[key].get_sanity())
         if status == 'Bankrupt':
-            widg.delete(playerIDs.pop(key))
+            widg.delete(playerIDs[key])
+            playerIDs.pop(key)
             san = "BANKRUPT!"
         elif status == 'Jail':
             pos = inJail[key].copy()
