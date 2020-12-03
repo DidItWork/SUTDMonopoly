@@ -35,10 +35,11 @@ num_of_tiles = 24
 tiles = []
 
 num_players = 0
+bankruptcy = 0
 players = []
 names = []
 
-pass_go = 200
+pass_go = 150
 cards = []
 carded = []
 
@@ -47,7 +48,7 @@ go_name = "Pass go"
 
 go_pos = 0
 jail_pos = 6
-tax_pos = {9: 100, 21: 50}
+tax_pos = {9: 50, 21: 75}
 chance_pos = [3, 15]
 freeParking_pos = 12
 goToJail_pos = 18
@@ -130,7 +131,7 @@ class player():
         self.__status = "Normal"
         self.__position = 0
         self.__name = name
-        self.__sanity = 300
+        self.__sanity = 200
         self.__building = []
         self.__jail = 0
 
@@ -144,8 +145,12 @@ class player():
         self.__status = status
         
         if status == "Bankrupt":
-            global num_players
-            num_players -= 1
+            holdup = ""
+            while holdup != "ABCDEF":
+                holdup = input("ABCDEF")
+            
+            global bankruptcy
+            bankruptcy += 1
         
         if status == "Jail":
             self.__jail = 3
@@ -169,11 +174,6 @@ class player():
     
     def update_sanity(self, sanity):
         self.__sanity += sanity
-        
-        if self.__sanity < 0:
-            holdup = ""
-            while holdup != "ABCDEF":
-                holdup = input("ABCDEF")
     
     def get_jailCount(self):
         return self.__jail
@@ -289,10 +289,9 @@ def tax(player_pos,player_id):
     
     if players[player_id].get_sanity() < val:
         bankrupt(val, player_id, None)
-        return
-    
-    print(f"Opps, you landed on {tax_name} and lost {val} sanity.")
-    players[player_id].update_sanity(-val)
+    else:
+        print(f"Opps, you landed on {tax_name} and lost {val} sanity.")
+        players[player_id].update_sanity(-val)
     pass
 
 def free_parking():
@@ -339,7 +338,10 @@ def chance(player_id):
     elif cards[chosen].get_effect()[0] == "birthday":
         for i in range(len(players)):
             
-            if i == player_id:
+            if players[i].get_status == "Bankrupt":
+                continue
+            
+            elif i == player_id:
                 continue
             
             # If player does not have enough sanity to lose
@@ -490,6 +492,7 @@ def bankrupt(amount, from_player, to_player):
             
     # If owner owns no building, bankrupt them
     if len(sell_building) == 0:
+            
         print("bAnKrUpT g3t g00d n00b")
         players[from_player].update_status("Bankrupt")
     
@@ -504,6 +507,8 @@ def bankrupt(amount, from_player, to_player):
     # If owner owns building, give an option to liquidate assets until amount == 0
     else:
         while amount > 0:
+            update_board()
+            
             print(f"\nYou still owe {int(amount)} sanity.\n")
             print("Index", "Name", "Value")
             for index, value in enumerate(sell_building):
@@ -664,18 +669,15 @@ def game():
     # Initialising variables
     render_game()
     
-    """
-    There's a bug here, where the tracking of the players and turns isn't perfect
-    when there is more than 2 players
-    """
-    
     counter = 0
-    while num_players > 1:
+    
+    while bankruptcy < num_players - 1:
         print("\nIt's %s's turn." % (players[counter].get_name()))
                 
         if players[counter].get_status() == "Jail":
             jail_turn(counter)
         
+        # 'if' is used here in the case where the player breaks out of jail
         if players[counter].get_status() == "Normal":
             gameround(counter) 
         
