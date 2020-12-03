@@ -145,10 +145,6 @@ class player():
         self.__status = status
         
         if status == "Bankrupt":
-            holdup = ""
-            while holdup != "ABCDEF":
-                holdup = input("ABCDEF")
-            
             global bankruptcy
             bankruptcy += 1
         
@@ -440,7 +436,7 @@ def upgrade_building(active_building, player):
     print(active_building.get_cost(active_building.get_level() + 1))
     print(player.get_sanity())
     
-    buy = "y"
+    buy = "z"
     while buy[0] not in "yYnN":
         buy = input("Do you want to upgrade %s to Level %s , cost: %s sanity [y/n]? " 
                      % (active_building.get_name(), 
@@ -455,7 +451,7 @@ def upgrade_building(active_building, player):
     pass
 
 def buy_building(player, player_id, active_building):
-    buy = "y"
+    buy = "z"
     while buy[0] not in "yYnN":
         buy = input(("Do you want to buy %s, cost: %s sanity [y/n]? " % (active_building.get_name(), active_building.get_cost())))
         if buy == "":
