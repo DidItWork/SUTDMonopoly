@@ -348,7 +348,7 @@ def chance(player_id):
         if dice1 == dice2:
             players[player_id].update_sanity(cards[chosen].get_effect()[1])
             print ("You gobbled down your caifan like a vaccum cleaner...\n...\nbut you are fine!")
-            print ("Your sanity increased by", card[chosen].get_effect()[1], "sanity.")
+            print ("Your sanity increased by", cards[chosen].get_effect()[1], "sanity.")
         
         else:
             
@@ -416,7 +416,6 @@ def pay_rent(from_player, to_player, amount):
         return
     
     bankrupt(amount, from_player, to_player)
-    input("waiting")
     pass
 
 def upgrade_building(active_building, player):
@@ -451,7 +450,7 @@ def bankrupt(amount, from_player, to_player):
     print(f"{names[from_player]} is out of sanity!")
     
     # Initialize some local variables for later
-    sell = 0
+    sell = 2
     total_cost = 0
     sell_building = []
     owned_building = []
@@ -673,7 +672,7 @@ def game():
     winner = ""
     for play in players:
         if play.get_status() == "Normal":
-            winner = player.get_name()
+            winner = play.get_name()
             
     print(f"\nCongrats to {winner}!\nWinner: {winner}!")
     
@@ -932,13 +931,12 @@ def update_board(myTurn, d1, d2):
         widg.itemconfigure(sanCounter[key], text = "Sanity: {}".format(san))
         building_of_note = players[myTurn].get_position()
         if building_of_note in building_pos:
-            print("tracking...")
             b = tiles[building_of_note].get_building()
             own = b.get_owner()
             if own == None:
                 own = "---"
             else:
-                own = players[own].get_name()
+                own = players[own].get_name()   
             tileData = "Name: {}\nOwner: {}\nLevel: {}\nRent: {}".format(b.get_name(), own, b.get_level(), b.get_rent())
         else:
             tileData = "Name:\nOwner:\nLevel:\nRent:"
