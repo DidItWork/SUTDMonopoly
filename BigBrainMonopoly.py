@@ -494,7 +494,7 @@ def bankrupt(amount, from_player, to_player):
             for index, value in enumerate(sell_building):
                 print(index + 1, value[1], value[2])
 
-            while sell < 1 or sell > len(sell_building) + 1:
+            while sell < 1 or sell > len(sell_building):
                 sell = input("Choose building index to sell 1 to %s: " % len(sell_building))
                 try:
                     sell = int(sell)
