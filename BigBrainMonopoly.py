@@ -493,7 +493,7 @@ def bankrupt(amount, from_player, to_player):
     # If owner owns no building, bankrupt them
     if len(sell_building) == 0:
             
-        print("bAnKrUpT g3t g00d n00b")
+        print(f"{names[from_player]} went bankrupt!")
         players[from_player].update_status("Bankrupt")
     
     # If owner building does not cover up rent, bankrupt them and transfer all property
@@ -501,7 +501,7 @@ def bankrupt(amount, from_player, to_player):
         for i in range(len(sell_building)):
             tiles[sell_building[i][0]].get_building().set_ownership(to_player)
             
-        print("bAnKrUpT g3t g00d n00b")
+        print(f"{names[from_player]} went bankrupt!")
         players[from_player].update_status("Bankrupt")
         
     # If owner owns building, give an option to liquidate assets until amount == 0
@@ -533,7 +533,7 @@ def bankrupt(amount, from_player, to_player):
                 return
            
             if len(sell_building) == 0:
-                print("bAnKrUpT g3t g00d n00b")
+                print(f"{names[from_player]} went bankrupt!")
                 players[from_player].update_status("Bankrupt")
                 return
     pass
@@ -627,7 +627,7 @@ def gameround(player_id):
         elif tiles[player_pos].get_type()=="tax":
             tax(player_pos,player_id)
         elif tiles[player_pos].get_type()=="jail":
-            print("Wave to those suckers in jail!")
+            print("Just visiting.")
         elif tiles[player_pos].get_type()=="home":
             home(player_id)
         elif tiles[player_pos].get_type() == "freeParking":
@@ -751,9 +751,6 @@ def render_game():
     
     initUI()
     
-# GUI/Board functions
-#-------------------------------------------------------------------------#
-
 # GUI/Board functions
 #-------------------------------------------------------------------------#
 
