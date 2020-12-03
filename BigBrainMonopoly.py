@@ -282,9 +282,12 @@ def jail(player_id):
 def tax(player_pos,player_id):
     val = tax_pos[player_pos]
     print(f"Opps, you landed on {tax_name} and lost {val} sanity.")
-    players[player_id].update_sanity(-val)
+    if players[player_id].get_sanity() < val:
+        bankrupt(val, player_id, None)
+    else:
+        players[player_id].update_sanity(-val)
     pass
-
+  
 def free_parking():
     print("Free parking, take a break!")
     
