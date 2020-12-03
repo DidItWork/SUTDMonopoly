@@ -754,6 +754,9 @@ def render_game():
 # GUI/Board functions
 #-------------------------------------------------------------------------#
 
+# GUI/Board functions
+#-------------------------------------------------------------------------#
+
 def initUI():    
     
     top.title("SUTD-opoly")
@@ -902,7 +905,14 @@ def initUI():
     widg.create_text(tileTitleGuide, text="Current Tile", fill = 'white')
     global guide
     guide = widg.create_text(tileGuide, text = "Name:\nOwner:\nLevel:\nRent:", anchor = tkinter.NW, fill = 'white')
-        
+    
+    #current player's turn indicator
+    boardCoords = [0,0,boardDimensionY,boardDimensionY]
+    msgBox = [avg(boardCoords,'x'), avg(boardCoords,'y')]
+    
+    global turnBox
+    turnBox = widg.create_text(msgBox, text = "player {}'s turn!".format(players[0].get_name()), fill = 'white')
+    
     widg.pack() #Geometry setter
 
 def update_board(*args):
@@ -966,6 +976,9 @@ def update_board(*args):
             #display dice roll
             setDice(arGs[1], dicePips1)
             setDice(arGs[2], dicePips2)
+            
+            name = players[arGs[0]].get_name()
+            widg.itemconfigure(turnBox, text = "player {}'s turn!".format(name))
     return
     pass
 
