@@ -492,7 +492,8 @@ def bankrupt(amount, from_player, to_player):
     # If owner owns building, give an option to liquidate assets until amount == 0
     else:
         while amount > 0:
-            print(f"\nYou still owe {int(amount)} sanity.\n")
+            owed = amount - players[from_player].get_sanity()
+            print(f"\nYou still owe {int(owed)} sanity.\n")
             print("Index", "Name", "Value")
             for index, value in enumerate(sell_building):
                 print(index + 1, value[1], value[2])
