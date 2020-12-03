@@ -54,48 +54,68 @@ goToJail_pos = 18
 building_pos = [1, 2, 4, 5, 7, 8, 10, 11, 13, 14, 16, 17, 19, 20, 22, 23]
 
 building_info = ["home",
-                ["name1", "truncated1", [100, 200, 300]],
-                ["name2", "truncated2", [100, 200, 300]],
+                ["Smith’s invisible hand", "Smith", [120, 150, 210]],
+                ["Geertz’s fighting cocks", "Geertz", [120, 150, 210]],
                 "chance",
-                ["name4", "truncated3", [100, 200, 300]],
-                ["name5", "truncated4", [100, 200, 300]],
+                ["L’Hopital’s Glue", "L’Hopital", [80, 100, 140]],
+                ["Riemann’s Sun", "Riemann", [120, 150, 210]],
                 "jail",
-                ["name7", "truncated7", [100, 200, 300]],
-                ["name8", "truncated8", [100, 200, 300]],
+                ["Baked Rhino", "Rhino", [60, 80, 120]],
+                ["Flattened Grasshopper", "Grasshopper", [60, 80, 120]],
                 "tax",
-                ["name10", "truncated10", [100, 200, 300]],
-                ["name11", "truncated11", [100, 200, 300]],
+                ["Hooke’s Hook", "Hooke", [80, 100, 140]],
+                ["Newton’s Apple", "Newton", [120, 150, 210]],
                 "free parking",
-                ["name13", "truncated13", [100, 200, 300]],
-                ["name14", "truncated14", [100, 200, 300]],
+                ["Vocareum", "Vocareum", [80, 100, 140]],
+                ["Jupyter", "Jupyter", [80, 100, 140]],
                 "chance",
-                ["name16", "truncated16", [100, 200, 300]],
-                ["name17", "truncated17", [100, 200, 300]],
+                ["IMU Device", "IMU Device", [120, 150, 210]],
+                ["Parachute", "Parachute", [80, 100, 140]],
                 "go to jail",
-                ["name19", "truncated19", [100, 200, 300]],
-                ["name20", "truncated20", [100, 200, 300]],
+                ["Piazza", "Piazza", [100, 120, 180]],
+                ["Edimension", "Edimension", [120, 150, 210]],
                 "tax",
-                ["name22", "truncated22", [100, 200, 300]],
-                ["name23", "truncated23", [100, 200, 300]]]
+                ["Fairprice Xtra", "Fairprice", [50, 70, 100]],
+                ["Pick n’ Go", "Pick n’ Go", [160, 200, 280]]]
 
+#Initialise parameters for the GUI
+#-------------------------------------------------------------------------#
 boxLength = 100
 boxHeight = 130
 smolBoxHt = 90
 rot = [270, 180, 90, 0]
+priceIDs = {}
+ownedIDs = {}
+playerIDs = {}
+sanCounter = []
+guideBoxes = []
+
+dicePips1 = []
+dicePips2 = []
 
 cornerPos = num_of_tiles/4
 cornerXYs = [[boxHeight+5*boxLength, boxHeight+5*boxLength, 2*boxHeight+ 5*boxLength, 2*boxHeight+ 5*boxLength], 
              [0, boxHeight+5*boxLength, boxHeight, 2*boxHeight+5*boxLength],
              [0,0,boxHeight,boxHeight],
              [boxHeight+5*boxLength,0,2*boxHeight+5*boxLength,boxHeight]] #hardcoded corners
+centreGo = [(cornerXYs[0][0]+cornerXYs[0][2])/2 + 7.5, (cornerXYs[0][1]+cornerXYs[0][3])/2 + 7.5]
 boardDimensionY = 2*(boxHeight) + (7-2)*(boxLength)
 
-playerCols = ['green', 'blue', 'red', "magenta", "black"]
-playerPos = [[682.5, 687.5, 687.5, 692.5], 
-             [692.5, 687.5, 697.5, 692.5], 
-             [702.5, 687.5, 707.5, 692.5],
-             [687.5, 697.5, 692.5, 702.5], 
-             [697.5, 697.5, 702.5, 702.5]]
+diceMaps = [[0,0,0,1,0,0,0],
+            [1,0,0,0,0,0,1],
+            [1,0,0,1,0,0,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,1,0,1,1],
+            [1,1,1,0,1,1,1]]
+
+playerCols = ['green', 'blue', 'red', "magenta", "cyan"]
+playerPos = [centreGo, 
+             [centreGo[0]+20, centreGo[1]+20],
+             [centreGo[0]-20, centreGo[1]+20],
+             [centreGo[0]+20, centreGo[1]-20],
+             [centreGo[0]-20, centreGo[1]-20]]
+inJail = []
+justVisiting = []
 
 top = tkinter.Tk()
 widg = tkinter.Canvas(top, bg = "black", height = boardDimensionY, width = boardDimensionY)
@@ -110,7 +130,7 @@ class player():
         self.__status = "Normal"
         self.__position = 0
         self.__name = name
-        self.__sanity = 500 
+        self.__sanity = 300
         self.__building = []
         self.__jail = 0
 
@@ -149,6 +169,11 @@ class player():
     
     def update_sanity(self, sanity):
         self.__sanity += sanity
+        
+        if self.__sanity < 0:
+            holdup = ""
+            while holdup != "ABCDEF":
+                holdup = input("ABCDEF")
     
     def get_jailCount(self):
         return self.__jail
@@ -187,14 +212,11 @@ class building():
     
     def get_cost(self, *level):
         cost = 0
-
-        if len(level) == 0:  
-            if self.__level == 0:
-                return self.__cost[0]
-            else:
-                for i in range(self.__level):
-                    cost += self.__cost[i]
-                return cost
+        
+        if len(level) == 0:
+            for i in range(self.__level + 1):
+                cost += self.__cost[i]
+            return cost
         else:
             return self.__cost[level[0]]
         
@@ -239,48 +261,15 @@ class card():
     def get_effect(self):
         return self.__effect
     
-# GUI-Related Functions
-#-------------------------------------------------------------------------#
-def avg(coordLs, xy):
-    if xy == "x":
-        mean = (coordLs[0]+coordLs[2])/2
-    elif xy == 'y':
-        mean = (coordLs[1]+coordLs[3])/2
-    else:
-        return None
-    return mean
-        
-
-def getProperties(coord, ori, thisId):
-    
-    centre = [avg(coord, 'x'), avg(coord, 'y')]
-    smolBox = coord.copy()
-    if(type(ori) is int): #Normal tile (not corner)
-        smolBox[ori] += ((-1)**(ori < 0))*smolBoxHt
-        namePos = [avg(smolBox, 'x') , avg(smolBox, 'y')]
-        textRot = rot[ori]
-        
-        if (ori%2 == 0):
-            bottom = [((-1)**(ori < 0))*10+coord[ori], avg(coord, 'y')]
-            ownerPos = [((-1)**(ori >= 0))*30+namePos[0], namePos[1]]
-        else:
-            bottom = [avg(coord, 'x'), ((-1)**(ori < 0))*10+coord[ori]]
-            ownerPos = [namePos[0], ((-1)**(ori >= 0))*30+namePos[1]]
-    else: #If it's a corner
-        smolBox[-1] -= boxHeight-smolBoxHt
-        smolBox[0] += boxHeight-smolBoxHt
-        bottom = None
-        textRot = None
-        namePos = [avg(smolBox, 'x') , avg(smolBox, 'y')]
-        ownerPos = None
-    return (thisId, smolBox, centre, bottom, namePos, ownerPos, textRot) 
-    
 # Game functions
 #-------------------------------------------------------------------------#
 def roll():
     #return a tuple of two integers (1-6) from dice rolls
     dice1 = random.randint(1, 6)
     dice2 = random.randint(1, 6)
+    print("Roll 1:", dice1)
+    print("Roll 2:", dice2)
+    print("\n")
     
     return dice1, dice2
 
@@ -297,6 +286,11 @@ def jail(player_id):
 
 def tax(player_pos,player_id):
     val = tax_pos[player_pos]
+    
+    if players[player_id].get_sanity() < val:
+        bankrupt(val, player_id, None)
+        return
+    
     print(f"Opps, you landed on {tax_name} and lost {val} sanity.")
     players[player_id].update_sanity(-val)
     pass
@@ -312,55 +306,77 @@ def chance(player_id):
     if len(carded) == 0:
         carded = list(range(len(cards)))
     
-    # Call this something else hahaha, randomz was just an example
-    randomz = random.choice(carded)
-    carded.remove(randomz)
+    # Randomly chosing a card
+    chosen = random.choice(carded)
+    carded.remove(chosen)
 
-    print(cards[randomz].get_name())
+    print(cards[chosen].get_name())
 
     # If "update sanity"
-    if cards[randomz].get_effect()[0] == "update sanity":
-        players[player_id].update_sanity(cards[randomz].get_effect()[1])
+    if cards[chosen].get_effect()[0] == "update sanity":
         
-        if cards[randomz].get_effect()[1] < 0:
-            print ("Your sanity decreased by", cards[randomz].get_effect()[1], "sanity")
-        elif cards[randomz].get_effect()[1] > 0:
-            print ("Your sanity increased by", cards[randomz].get_effect()[1], "sanity")
+        # If card chosen decreases sanity
+        if cards[chosen].get_effect()[1] < 0:
+            
+            # If player does not have enough sanity to lose
+            if players[player_id].get_sanity() < -cards[chosen].get_effect()[1]:
+                bankrupt(-cards[chosen].get_effect()[1], player_id, None)
+            else:
+                players[player_id].update_sanity(cards[chosen].get_effect()[1])
+                print ("Your sanity decreased by", -cards[chosen].get_effect()[1], "sanity.")
+
+        # If card chosen increases sanity
+        elif cards[chosen].get_effect()[1] > 0:
+            players[player_id].update_sanity(cards[chosen].get_effect()[1])
+            print ("Your sanity increased by", cards[chosen].get_effect()[1], "sanity.")
 
     # If "sanity for all"
-    elif cards[randomz].get_effect()[0] == "sanity for all":
+    elif cards[chosen].get_effect()[0] == "sanity for all":
         for i in range(len(players)):
-            players[i].update_sanity(cards[randomz].get_effect()[1])
+            players[i].update_sanity(cards[chosen].get_effect()[1])
     
     # If "birthday"
-    elif cards[randomz].get_effect()[0] == "birthday":
+    elif cards[chosen].get_effect()[0] == "birthday":
         for i in range(len(players)):
-            players[i].update_sanity(-cards[randomz].get_effect()[1])
-            players[player_id].update_sanity(cards[randomz].get_effect()[1])
+            
+            if i == player_id:
+                continue
+            
+            # If player does not have enough sanity to lose
+            elif players[i].get_sanity() < cards[chosen].get_effect()[1]:
+                bankrupt(cards[chosen].get_effect()[1], i, player_id)
+
+            else:
+                players[player_id].update_sanity(cards[chosen].get_effect()[1])
+                players[i].update_sanity(-cards[chosen].get_effect()[1])
         
     # If "jail"
-    elif cards[randomz].get_effect()[0] == "go to jail":
+    elif cards[chosen].get_effect()[0] == "go to jail":
         jail(player_id)
         
     # If "roll"
-    elif cards[randomz].get_effect()[0] == "roll double":
+    elif cards[chosen].get_effect()[0] == "roll double":
         input("Press 'Enter' to roll.")
         
         dice1, dice2 = roll()
-        print("Roll 1:", dice1)
-        print("Roll 2:", dice2)
         
         if dice1 == dice2:
-            players[player_id].update_sanity(cards[randomz].get_effect()[1])
-            print ("You gobled down your caifan like a vaccum cleaner. But you are fine!")
-            print ("Your sanity increased by", card[randomz].get_effect()[1], "sanity")
+            players[player_id].update_sanity(cards[chosen].get_effect()[1])
+            print ("You gobbled down your caifan like a vaccum cleaner...\n...\nbut you are fine!")
+            print ("Your sanity increased by", cards[chosen].get_effect()[1], "sanity.")
+        
         else:
-            players[player_id].update_sanity(-cards[randomz].get_effect()[1])
-            print ("You gobled down your caifan like a vaccum cleaner and got food poisoning!")
-            print ("Your sanity decreased by", cards[randomz].get_effect()[1], "sanity.")
+            
+            # If player does not have enough sanity to lose
+            if players[player_id].get_sanity() < cards[chosen].get_effect()[1]:
+                bankrupt(cards[chosen].get_effect()[1], player_id, None)
+            else:                     
+                players[player_id].update_sanity(-cards[chosen].get_effect()[1])
+                print ("You gobbled down your caifan like a vaccum cleaner...\n...\nand got food poisoning!")
+                print ("Your sanity decreased by", cards[chosen].get_effect()[1], "sanity.")
     
     # If "lose property"
-    elif cards[randomz].get_effect()[0] == "lose a property":     
+    elif cards[chosen].get_effect()[0] == "lose a property":
         
         owned_building = []
         lose_building = []
@@ -382,30 +398,24 @@ def chance(player_id):
             
         # If player owns building, give an option to choose a building to sell
         else: 
-            print("Index", "Name", "Value")
-                for index, value in enumerate(lose_building):
-                    print(index + 1, value[1], value[2])
+            print("Index", "Name", "Value", "\n")
+            for index, value in enumerate(lose_building):
+                print(index + 1, value[1], value[2])
 
-              while lose < 1 or lose > len(lose_building) + 1:
-                    lose = int(input("Choose building index to lose: 1 to %s: " % len(lose_building)))
-                    try:
-                        lose = int(lose)
-                    except:
-                        lose = 0
+            while lose < 1 or lose > len(lose_building) + 1:
+                  lose = int(input("Choose building index to lose: 1 to %s: " % len(lose_building)))
+                  try:
+                      lose = int(lose)
+                  except:
+                      lose = 0
 
-              tiles[lose_building[lose - 1][0]].get_building().set_ownership(None)
-              print("Your have lost ownership of", lose_building[lose - 1][1])
+            tiles[lose_building[lose - 1][0]].get_building().set_ownership(None)
+            print("Your have lost ownership of", lose_building[lose - 1][1])
         pass
     
 def pay_rent(from_player, to_player, amount):
     print("\nRent time!")
     print(f"Pay {amount} sanity to {names[to_player]}.")
-    
-    """
-    # Optional statement
-    print("Payer %s : " % names[from_player], players[from_player].get_sanity())
-    print("Landlord %s : " % names[to_player], players[to_player].get_sanity())
-    """
     
     # Check if there's enough sanity to transfer
     if int(players[from_player].get_sanity()) < amount:
@@ -419,19 +429,16 @@ def pay_rent(from_player, to_player, amount):
         players[from_player].update_sanity(-amount)
         players[to_player].update_sanity(amount)
         return
-        
-    """
-    # Optional statement
-    print(amount, -amount)
-    print("Payer %s : " % names[from_player], players[from_player].get_sanity())
-    print("Landlord %s : " % names[to_player], players[to_player].get_sanity())
-    """
     
     bankrupt(amount, from_player, to_player)
     pass
 
 def upgrade_building(active_building, player):
-    buy = "z"
+        
+    print(active_building.get_cost(active_building.get_level() + 1))
+    print(player.get_sanity())
+    
+    buy = "y"
     while buy[0] not in "yYnN":
         buy = input("Do you want to upgrade %s to Level %s , cost: %s sanity [y/n]? " 
                      % (active_building.get_name(), 
@@ -441,13 +448,12 @@ def upgrade_building(active_building, player):
             buy = "z"
         
     if buy[0] in "yY":
+        player.update_sanity(-active_building.get_cost(active_building.get_level() + 1))
         active_building.level_up()
-        player.update_sanity(-active_building.get_cost())
-        print("Building owned by:",names[active_building.get_owner()])
     pass
 
 def buy_building(player, player_id, active_building):
-    buy = "z"
+    buy = "y"
     while buy[0] not in "yYnN":
         buy = input(("Do you want to buy %s, cost: %s sanity [y/n]? " % (active_building.get_name(), active_building.get_cost())))
         if buy == "":
@@ -457,6 +463,7 @@ def buy_building(player, player_id, active_building):
         active_building.set_ownership(player_id)
         player.update_sanity(-active_building.get_cost())
         print(f"{active_building.get_name()} is now owned by: {names[active_building.get_owner()]}")
+        return
     pass
 
 def bankrupt(amount, from_player, to_player):
@@ -502,7 +509,7 @@ def bankrupt(amount, from_player, to_player):
             for index, value in enumerate(sell_building):
                 print(index + 1, value[1], value[2])
 
-            while sell < 1 or sell > len(sell_building) + 1:
+            while sell < 1 or sell > len(sell_building):
                 sell = input("Choose building index to sell 1 to %s: " % len(sell_building))
                 try:
                     sell = int(sell)
@@ -531,9 +538,6 @@ def jail_turn(player_id):
         input("Roll a double to break out of jail! Press 'Enter' to roll.")
         dice1, dice2 = roll()
         
-        print(f"Roll 1: {dice1}")
-        print(f"Roll 2: {dice2}")
-        
         if dice1 == dice2:
             players[player_id].update_status("Normal")
             print("PRISON BREAK!!!")
@@ -556,11 +560,10 @@ def gameround(player_id):
 
     while dice1==dice2:
         # Pseudo code to give the impression of control
-        input("Press 'Enter' to roll.")
+        input("\nPress 'Enter' to roll.")
         
         dice1, dice2 = roll()
-        print("Roll 1:", dice1)
-        print("Roll 2:", dice2)
+        
         step = dice1 + dice2
         
         # Counter for doubles, maximum of 3 doubles in a row
@@ -568,6 +571,7 @@ def gameround(player_id):
             doubles += 1
             
         if doubles == 3:
+            print("You rolled a double 3 times a row! You're going to JAIL for being a CHEATER!")
             jail(player_id)
             return
             
@@ -576,10 +580,12 @@ def gameround(player_id):
             home(player_id)
         
         player.update_position(step)
+        
+        update_board(player_id, dice1, dice2)
+        
         player_pos = player.get_position()
-        print("Player position:", player_pos, "\n")
 
-        if tiles[player_pos].get_type()=="building":
+        if tiles[player_pos].get_type() == "building":
             active_building = tiles[player_pos].get_building()
             
             print(f"You landed on {tiles[player_pos].get_building().get_name()}.")
@@ -594,13 +600,14 @@ def gameround(player_id):
                 
                 # Break if player goes bankrupt here
                 if player.get_status() == "Bankrupt":
-                    break
+                    update_board(player_id, dice1, dice2)
+                    return
             
-            # If landed on own building, upgrade if possible
+            # If landed on owned building, upgrade if possible
             elif active_building.get_owner() == player_id:
                 if active_building.get_level() >= 2:
                     print("Building at max level!")
-                elif active_building.get_cost() > player.get_sanity():
+                elif active_building.get_cost(active_building.get_level() + 1) > player.get_sanity():
                     print("Sorry, you do not have enough sanity to upgrade this building.")
                 else:
                     upgrade_building(active_building, player)
@@ -622,22 +629,16 @@ def gameround(player_id):
             free_parking()
         elif tiles[player_pos].get_type() == "goToJail":
             jail(player_id)
-            return
         else:
             print("Some error occurred.")
-            
-
         
-    
-    # return board
+        update_board(player_id, dice1, dice2)
+        
     pass
 
 # Initialize variables and players
 #-------------------------------------------------------------------------#
-def game():
-    # Initialising variables
-    render_game()
-    
+def game():    
     # Get number of players
     global num_players
     while num_players < 2 or num_players > 5:
@@ -659,34 +660,45 @@ def game():
                 break
             else:
                 print("Name already exist! Please Reenter name.")
-    initUI()
+                
+    # Initialising variables
+    render_game()
+    
+    """
+    There's a bug here, where the tracking of the players and turns isn't perfect
+    when there is more than 2 players
+    """
+    
     counter = 0
-    while num_players != 1:
+    while num_players > 1:
         print("\nIt's %s's turn." % (players[counter].get_name()))
                 
         if players[counter].get_status() == "Jail":
             jail_turn(counter)
         
         if players[counter].get_status() == "Normal":
-            gameround(counter)
-        update_board()    
+            gameround(counter) 
+        
         #Cycling between players
         counter += 1
         counter = counter % num_players
-    top.mainloop()
     
     # When there's only 1 player left, announce winner of the game
     winner = ""
     for play in players:
         if play.get_status() == "Normal":
             winner = play.get_name()
-            break
             
-    print("\nWinner: " + winner + "!")
+    print(f"\nCongrats to {winner}!\nWinner: {winner}!")
     
+    end_key = ""
+    while end_key != "end":
+        end_key = input("Enter 'end' to close window. ")
+        end_key = end_key.lower()
     pass
 
 def render_game():
+
     # Initialize the tiles accordingly
     for i in range(num_of_tiles):
         if i in building_pos:
@@ -735,11 +747,10 @@ def render_game():
     global carded
     carded = list(range(len(cards)))
     
+    initUI()
+    
 # GUI/Board functions
 #-------------------------------------------------------------------------#
-priceIDs = {}
-ownedIDs = {}
-playerIDs = {}
 
 def initUI():    
     
@@ -807,63 +818,195 @@ def initUI():
             widg.create_text(decor[2], text = 'GO!', angle = 45) 
         elif i == jail_pos:
             widg.create_rectangle(decor[1], outline = 'black', fill = '#FFA700')
+            centre = [avg(decor[1], 'x'), avg(decor[1], 'y')]
+            widg.create_text(centre, text = "JAIL", angle = 315)
+            niceCorner = [centre[0]-65, centre[1]+65]
+            for i in range(0, 9, 2):
+                if i == 0:
+                    inJail.append(centre)
+                    justVisiting.append(niceCorner)
+                else:
+                    jailSpaceX = centre[0] - ((-1)**(not i%3 == 2))*17.5
+                    jailSpaceY = centre[1] - ((-1)**(i > 5))*17.5
+                    inJail.append([jailSpaceX, jailSpaceY])
+                    visitSpaceX = niceCorner[0] + (i > 5)*(2**(i > 7))*30
+                    visitSpaceY = niceCorner[1] - (i < 5)*(2**(i > 3))*30
+                    justVisiting.append([visitSpaceX, visitSpaceY])
+            
         elif i in tax_pos:
-            widg.create_text(decor[2], text = "TAX\n\n{:d} SAN".format(tax_pos[i]), angle = decor[6]) 
+            widg.create_text(decor[2], text = "TAX\n \n{:d} \nSANITY".format(tax_pos[i]), angle = decor[6], justify = tkinter.CENTER) 
         elif i in chance_pos:
             widg.create_text(decor[2], text = "?", angle = decor[6])
-            widg.create_text(decor[3], text = "CHANCE", angle = decor[6])
+            widg.create_text(decor[4], text = "CHANCE", angle = decor[6])
         elif i == freeParking_pos:
-            widg.create_text(decor[2], text = "FREE\nPARKING", angle = 225)
+            widg.create_text(decor[2], text = "FREE\nPARKING", angle = 225, justify = tkinter.CENTER)
         elif i == goToJail_pos:
-            widg.create_text(decor[2], text = "GO TO\nJAIL", angle = 135)
-    for i in range(num_players):
-        player = widg.create_rectangle(playerPos[i], fill=playerCols[i])
-        playerIDs[i] = player 
+            widg.create_text(decor[2], text = "GO TO\nJAIL", angle = 135, justify = tkinter.CENTER)
+            
+    #create guiding boxes for legend
+    for i in range(2): 
+        for r in range(3):
+            boxRI = [(boxHeight+10)+160*r, (boardDimensionY/2 + 50*(i+1)), (boxHeight+10)+160*(r+1), (boardDimensionY/2) + 50*(i+2)]
+            guideBoxes.append(boxRI)
+    tileTitleGuide = [boxHeight+boxLength, boxHeight+(boxLength/4)]
+    tileGuide = [boxHeight+boxLength-40, boxHeight+(boxLength/4) + 10]
+    
+    #initialise DICE 
+    diceMid = []
+    dice = []
+    pips1 = []
+    pips2 = []
+    for i in range(2):
+        diceMid.append([boxHeight+(3.5+i)*boxLength, boxHeight+(0.5+i)*boxLength])
+    for i in diceMid:
+        dice.append([i[0]-45, i[1]-45, i[0]+45, i[1]+45])
+    for i in range(len(dice)):
+        widg.create_rectangle(dice[i], outline = "white")
+        if i == 0:
+            pips = pips1
+        else:
+            pips = pips2
+        for r in range(3):
+            for n in range(3):
+                x0 = dice[i][0]+ 13.5*(n+1) + 12*n
+                y0 = dice[i][1]+ 13.5*(r+1) + 12*r
+                pips.append([x0, y0, x0+12, y0+12])
+        pips.pop(1)
+        pips.pop(6)
+        
+    #initialise pips of first and second dice
+    for i in pips1:
+        dicePips1.append(widg.create_oval(i, fill = 'white', disabledfill = 'black', state = tkinter.DISABLED))
+    
+    for i in pips2:
+        dicePips2.append(widg.create_oval(i, fill = 'white', disabledfill = 'black', state = tkinter.DISABLED))
+    
+    #initialise tokens and player guide
+    for i in range(num_players): 
+        playerIDs[i] = makeToken(playerPos[i], playerCols[i])
+        nama = players[i].get_name()
+        startingCash = players[i].get_sanity()
+        
+        legend = guideBoxes[i][0:2]
+        for r in range(2):
+            legend[r] += 10
+            legend.append(legend[r]+30)
+            
+        widg.create_rectangle(legend, fill = playerCols[i])
+        widg.create_text(legend[2]+3, legend[1], text = "{:6s}".format(nama), anchor = tkinter.NW, fill = "white")
+        sanCounter.append(widg.create_text(legend[2]+3, legend[3], text = "Sanity: {:d}".format(startingCash), anchor = tkinter.SW, fill = "white"))
+        
+    #current tile checker initialisation
+    widg.create_text(tileTitleGuide, text="Current Tile", fill = 'white')
+    global guide
+    guide = widg.create_text(tileGuide, text = "Name:\nOwner:\nLevel:\nRent:", anchor = tkinter.NW, fill = 'white')
         
     widg.pack() #Geometry setter
-    print("UI Initialised")
-    
-        
-        
-                
-def update_board():
+
+def update_board(myTurn, d1, d2):
     for key in priceIDs:
-        widg.itemconfigure(priceIDs[key], text = tiles[key].get_building().get_rent())
-        widg.itemconfigure(ownedIDs[key], text = tiles[key].get_building().get_owner())
-    for key in playerIDs:
+        owner = tiles[key].get_building().get_owner()
+        if owner == None:
+            owner = "---"
+        else:
+            owner = players[owner].get_name()
+        widg.itemconfigure(priceIDs[key], text = int(tiles[key].get_building().get_rent()))
+        widg.itemconfigure(ownedIDs[key], text = owner)
+    playerIterations = playerIDs.copy()
+    for key in playerIterations:
         position = players[key].get_position()
         status = players[key].get_status()
-        pos = [avg(playerPos[key], 'x'), avg(playerPos[key], 'y')]
+        pos = playerPos[key].copy()
+        san = int(players[key].get_sanity())
         if status == 'Bankrupt':
-            widg.delete(playerIDs[key])
-            playerIDs.pop(key)
-        elif status == 'jail':
-            pos = [0,0]
-            widg.moveto(playerIDs[key], pos[0], pos[1])
+            widg.delete(playerIDs.pop(key))
+            san = "BANKRUPT!"
+        elif status == 'Jail':
+            pos = inJail[key].copy()
+            widg.moveto(playerIDs[key], pos[0]-10, pos[1]-10)
         else:
             if position == 0:
                 pass
             elif position > 0 and position < 6:
-                pos[0] -= (position-1)*boxLength + boxHeight
-                
+                pos[0] -= (position-1)*boxLength + boxHeight + 7.5
             elif position == 6:
-                pos = [0,0] #placeholder for jail
+                pos = justVisiting[key].copy() #placeholder for jail
             elif position > 6 and position <= 12:
-                pos[0] -= 5*boxLength + boxHeight
-                pos[1] -= (position-7)*boxLength + boxHeight
+                pos[0] -= 5*boxLength + boxHeight + 30
+                pos[1] -= (position-7)*boxLength + boxHeight -7.5
             elif position > 12 and position < 18:
                 pos[0] -= (17 - position)*boxLength + boxHeight
-                pos[1] -= 5*boxLength + boxHeight
+                pos[1] -= 5*boxLength + boxHeight + 30
             elif position == 18:
-                pos = [0,0] #placeholder for Jail
+                pos = inJail[key].copy() #placeholder for Jail
             elif position > 18:
-                pos[1] -= (23 - position)*boxLength + boxHeight
-            widg.moveto(playerIDs[key], pos[0], pos[1])
-    
-    print("Updating")
+                pos[1] -= (23 - position)*boxLength + boxHeight + 15
+            widg.moveto(playerIDs[key], pos[0]-10, pos[1]-10)
+        
+        widg.itemconfigure(sanCounter[key], text = "Sanity: {}".format(san))
+        building_of_note = players[myTurn].get_position()
+        if building_of_note in building_pos:
+            b = tiles[building_of_note].get_building()
+            own = b.get_owner()
+            if own == None:
+                own = "---"
+            else:
+                own = players[own].get_name()   
+            tileData = "Name: {}\nOwner: {}\nLevel: {}\nRent: {}".format(b.get_name(), own, b.get_level(), b.get_rent())
+        else:
+            tileData = "Name:\nOwner:\nLevel:\nRent:"
+        widg.itemconfigure(guide, text = tileData)
+        
+        #display dice roll
+        setDice(d1, dicePips1)
+        setDice(d2, dicePips2)
     return
     pass
 
+def avg(coordLs, xy):
+    if xy == "x":
+        mean = (coordLs[0]+coordLs[2])/2
+    elif xy == 'y':
+        mean = (coordLs[1]+coordLs[3])/2
+    else:
+        return None
+    return mean
+
+def makeToken(startPos, colour):
+    coords = [startPos[0]+10, startPos[1]+10, startPos[0]-10, startPos[1]-10]
+    token = widg.create_rectangle(coords, fill=colour, outline = colour)
+    return token    
+
+def getProperties(coord, ori, thisId):
+    
+    centre = [avg(coord, 'x'), avg(coord, 'y')]
+    smolBox = coord.copy()
+    if(type(ori) is int): #Normal tile (not corner)
+        smolBox[ori] += ((-1)**(ori < 0))*smolBoxHt
+        namePos = [avg(smolBox, 'x') , avg(smolBox, 'y')]
+        textRot = rot[ori]
+        
+        if (ori%2 == 0):
+            bottom = [((-1)**(ori < 0))*10+coord[ori], avg(coord, 'y')]
+            ownerPos = [((-1)**(ori >= 0))*30+namePos[0], namePos[1]]
+        else:
+            bottom = [avg(coord, 'x'), ((-1)**(ori < 0))*10+coord[ori]]
+            ownerPos = [namePos[0], ((-1)**(ori >= 0))*30+namePos[1]]
+    else: #If it's a corner
+        smolBox[-1] -= boxHeight-smolBoxHt
+        smolBox[0] += boxHeight-smolBoxHt
+        bottom = None
+        textRot = None
+        namePos = [avg(smolBox, 'x') , avg(smolBox, 'y')]
+        ownerPos = None
+    return (thisId, smolBox, centre, bottom, namePos, ownerPos, textRot) 
+
+def setDice(roll, pips):
+    dMap = diceMaps[roll-1]
+    for pip in range(len(dMap)):
+        if dMap[pip] == 1:
+            widg.itemconfigure(pips[pip], state = tkinter.NORMAL)
+        else:
+            widg.itemconfigure(pips[pip], state = tkinter.DISABLED)
 #Run the game
 game()
-#putting mainloop here doesn't work
