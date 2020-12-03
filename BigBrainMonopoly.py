@@ -283,6 +283,9 @@ def tax(player_pos,player_id):
     val = tax_pos[player_pos]
     print(f"Opps, you landed on {tax_name} and lost {val} sanity.")
     if players[player_id].get_sanity() < val:
+        leftovers = int(players[player_id].get_sanity())
+        players[player_id].update_sanity(-leftovers)
+        val -= leftovers
         bankrupt(val, player_id, None)
     else:
         players[player_id].update_sanity(-val)
@@ -313,7 +316,9 @@ def chance(player_id):
             
             # If player does not have enough sanity to lose
             if players[player_id].get_sanity() < -cards[chosen].get_effect()[1]:
-                bankrupt(-cards[chosen].get_effect()[1], player_id, None)
+                leftovers = int(players[player_id].get_sanity())
+                players[player_id].update_sanity(-leftovers)
+                bankrupt(cards[chosen].get_effect()[1] - leftovers, player_id, None)
             else:
                 players[player_id].update_sanity(cards[chosen].get_effect()[1])
                 print ("Your sanity decreased by", -cards[chosen].get_effect()[1], "sanity.")
@@ -337,7 +342,9 @@ def chance(player_id):
             
             # If player does not have enough sanity to lose
             elif players[i].get_sanity() < cards[chosen].get_effect()[1]:
-                bankrupt(cards[chosen].get_effect()[1], i, player_id)
+                leftovers = int(players[player_id].get_sanity())
+                players[player_id].update_sanity(-leftovers)
+                bankrupt(cards[chosen].get_effect()[1] - leftovers, i, player_id)
 
             else:
                 players[player_id].update_sanity(cards[chosen].get_effect()[1])
@@ -362,7 +369,9 @@ def chance(player_id):
             
             # If player does not have enough sanity to lose
             if players[player_id].get_sanity() < cards[chosen].get_effect()[1]:
-                bankrupt(cards[chosen].get_effect()[1], player_id, None)
+                leftovers = int(players[player_id].get_sanity())
+                players[player_id].update_sanity(-leftovers)
+                bankrupt(cards[chosen].get_effect()[1] - leftovers, player_id, None)
             else:                     
                 players[player_id].update_sanity(-cards[chosen].get_effect()[1])
                 print ("You gobbled down your caifan like a vaccum cleaner...\n...\nand got food poisoning!")
