@@ -289,9 +289,6 @@ def tax(player_pos,player_id):
         print(f"Opps, you landed on {tax_name} and lost {val} sanity.")
         players[player_id].update_sanity(-val)
     pass
-
-def free_parking():
-    print("Free parking, take a break!")
     
 def chance(player_id):
     
@@ -627,7 +624,7 @@ def gameround(player_id):
         elif tiles[player_pos].get_type()=="home":
             home(player_id)
         elif tiles[player_pos].get_type() == "freeParking":
-            free_parking()
+            print("Free parking, take a break!")
         elif tiles[player_pos].get_type() == "goToJail":
             jail(player_id)
         else:
