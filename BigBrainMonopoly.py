@@ -130,7 +130,7 @@ class player():
         self.__status = "Normal"
         self.__position = 0
         self.__name = name
-        self.__sanity = 500 
+        self.__sanity = 300
         self.__building = []
         self.__jail = 0
 
@@ -169,6 +169,11 @@ class player():
     
     def update_sanity(self, sanity):
         self.__sanity += sanity
+        
+        if self.__sanity < 0:
+            holdup = ""
+            while holdup != "ABCDEF":
+                holdup = input("ABCDEF")
     
     def get_jailCount(self):
         return self.__jail
@@ -207,7 +212,7 @@ class building():
     
     def get_cost(self, *level):
         cost = 0
-
+        
         if len(level) == 0:
             for i in range(self.__level + 1):
                 cost += self.__cost[i]
@@ -281,16 +286,15 @@ def jail(player_id):
 
 def tax(player_pos,player_id):
     val = tax_pos[player_pos]
-    print(f"Opps, you landed on {tax_name} and lost {val} sanity.")
+    
     if players[player_id].get_sanity() < val:
-        leftovers = int(players[player_id].get_sanity())
-        players[player_id].update_sanity(-leftovers)
-        val -= leftovers
         bankrupt(val, player_id, None)
-    else:
-        players[player_id].update_sanity(-val)
+        return
+    
+    print(f"Opps, you landed on {tax_name} and lost {val} sanity.")
+    players[player_id].update_sanity(-val)
     pass
-  
+
 def free_parking():
     print("Free parking, take a break!")
     
@@ -316,9 +320,7 @@ def chance(player_id):
             
             # If player does not have enough sanity to lose
             if players[player_id].get_sanity() < -cards[chosen].get_effect()[1]:
-                leftovers = int(players[player_id].get_sanity())
-                players[player_id].update_sanity(-leftovers)
-                bankrupt(cards[chosen].get_effect()[1] - leftovers, player_id, None)
+                bankrupt(-cards[chosen].get_effect()[1], player_id, None)
             else:
                 players[player_id].update_sanity(cards[chosen].get_effect()[1])
                 print ("Your sanity decreased by", -cards[chosen].get_effect()[1], "sanity.")
@@ -342,9 +344,7 @@ def chance(player_id):
             
             # If player does not have enough sanity to lose
             elif players[i].get_sanity() < cards[chosen].get_effect()[1]:
-                leftovers = int(players[player_id].get_sanity())
-                players[player_id].update_sanity(-leftovers)
-                bankrupt(cards[chosen].get_effect()[1] - leftovers, i, player_id)
+                bankrupt(cards[chosen].get_effect()[1], i, player_id)
 
             else:
                 players[player_id].update_sanity(cards[chosen].get_effect()[1])
@@ -369,9 +369,7 @@ def chance(player_id):
             
             # If player does not have enough sanity to lose
             if players[player_id].get_sanity() < cards[chosen].get_effect()[1]:
-                leftovers = int(players[player_id].get_sanity())
-                players[player_id].update_sanity(-leftovers)
-                bankrupt(cards[chosen].get_effect()[1] - leftovers, player_id, None)
+                bankrupt(cards[chosen].get_effect()[1], player_id, None)
             else:                     
                 players[player_id].update_sanity(-cards[chosen].get_effect()[1])
                 print ("You gobbled down your caifan like a vaccum cleaner...\n...\nand got food poisoning!")
@@ -436,6 +434,10 @@ def pay_rent(from_player, to_player, amount):
     pass
 
 def upgrade_building(active_building, player):
+        
+    print(active_building.get_cost(active_building.get_level() + 1))
+    print(player.get_sanity())
+    
     buy = "y"
     while buy[0] not in "yYnN":
         buy = input("Do you want to upgrade %s to Level %s , cost: %s sanity [y/n]? " 
@@ -446,8 +448,8 @@ def upgrade_building(active_building, player):
             buy = "z"
         
     if buy[0] in "yY":
+        player.update_sanity(-active_building.get_cost(active_building.get_level() + 1))
         active_building.level_up()
-        player.update_sanity(-active_building.get_cost())
     pass
 
 def buy_building(player, player_id, active_building):
@@ -461,6 +463,7 @@ def buy_building(player, player_id, active_building):
         active_building.set_ownership(player_id)
         player.update_sanity(-active_building.get_cost())
         print(f"{active_building.get_name()} is now owned by: {names[active_building.get_owner()]}")
+        return
     pass
 
 def bankrupt(amount, from_player, to_player):
@@ -581,9 +584,8 @@ def gameround(player_id):
         update_board(player_id, dice1, dice2)
         
         player_pos = player.get_position()
-        # print("Player position:", player_pos, "\n")
 
-        if tiles[player_pos].get_type()=="building":
+        if tiles[player_pos].get_type() == "building":
             active_building = tiles[player_pos].get_building()
             
             print(f"You landed on {tiles[player_pos].get_building().get_name()}.")
@@ -598,13 +600,14 @@ def gameround(player_id):
                 
                 # Break if player goes bankrupt here
                 if player.get_status() == "Bankrupt":
+                    update_board(player_id, dice1, dice2)
                     return
             
-            # If landed on own building, upgrade if possible
+            # If landed on owned building, upgrade if possible
             elif active_building.get_owner() == player_id:
                 if active_building.get_level() >= 2:
                     print("Building at max level!")
-                elif active_building.get_cost() > player.get_sanity():
+                elif active_building.get_cost(active_building.get_level() + 1) > player.get_sanity():
                     print("Sorry, you do not have enough sanity to upgrade this building.")
                 else:
                     upgrade_building(active_building, player)
@@ -626,7 +629,6 @@ def gameround(player_id):
             free_parking()
         elif tiles[player_pos].get_type() == "goToJail":
             jail(player_id)
-            return
         else:
             print("Some error occurred.")
         
