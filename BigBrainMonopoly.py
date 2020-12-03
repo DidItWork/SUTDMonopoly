@@ -2,7 +2,7 @@
 """
 Created on Mon Nov 16 17:54:30 2020
 
-@author: Benjamin Luo
+@author: Benjamin Luo, chuanshaof, Timothy, Wang Zhao
 """
 
 import tkinter
@@ -489,7 +489,7 @@ def bankrupt(amount, from_player, to_player):
     # If owner owns no building, bankrupt them
     if len(sell_building) == 0:
             
-        print(f"{names[from_player]} went bankrupt!")
+        print(f"{names[from_player]} went CRAZY for studying too hard!")
         players[from_player].update_status("Bankrupt")
     
     # If owner building does not cover up rent, bankrupt them and transfer all property
@@ -497,7 +497,7 @@ def bankrupt(amount, from_player, to_player):
         for i in range(len(sell_building)):
             tiles[sell_building[i][0]].get_building().set_ownership(to_player)
             
-        print(f"{names[from_player]} went bankrupt!")
+        print(f"{names[from_player]} went CRAZY for studying too hard!")
         players[from_player].update_status("Bankrupt")
         
     # If owner owns building, give an option to liquidate assets until amount == 0
@@ -529,7 +529,7 @@ def bankrupt(amount, from_player, to_player):
                 return
            
             if len(sell_building) == 0:
-                print(f"{names[from_player]} went bankrupt!")
+                print(f"{names[from_player]} went CRAZY for studying too hard!")
                 players[from_player].update_status("Bankrupt")
                 return
     pass
