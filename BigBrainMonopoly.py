@@ -10,19 +10,25 @@ import random
 
 #Initialise parameters, building values is a list of lists
 #-------------------------------------------------------------------------#
-# num_of_tiles - global number of tiles
 # tiles - list of tile objects making up the board
-
-# num_players - keep track of how players that are still "alive"
 # players - list of player objects
 # names - list of player names
-
-# pass_go - amount added for passing go
-# jail_pos - position of jail tiles
-# tax_pos - dictionary with tax tiles positions being the keys and the amount of the taxes being the values
-# chance_pos - position of chance tiles
 # cards - list of chance cards avaliable
 # carded - list of cards that are not drawn
+
+# tax_name - string for 'tax' name
+# go_name - string for 'go' name
+# pass_go - amount added for passing go
+# num_of_tiles - global number of tiles
+# num_players - keep track of how players there are
+# bankruptcy - keep track of how many players that have gone "bankrupt"
+
+# go_pos - position of 'go' tile
+# jail_pos - position of 'jail' tile
+# freeParking_pos - position of 'free parking' tile
+# goToJail_pos - position of 'go to jail' tile
+# tax_pos - dictionary with tax tiles positions being the keys and the amount of the taxes being the values
+# chance_pos - position of chance tiles
 
 # building_pos - position of the buildings on the respective tiles, 
 # cont. 0-39 anticlockwise starting from bottom left, i.e. GO is 0
@@ -31,27 +37,25 @@ import random
 # cont. building_info[x] are building names
 # cont. building_info[x][y] are building costs (if applicable)
 
-num_of_tiles = 24
 tiles = []
-
-num_players = 0
-bankruptcy = 0
 players = []
 names = []
-
-pass_go = 150
 cards = []
 carded = []
 
 tax_name = "tax"
 go_name = "Pass go"
+pass_go = 150
+num_of_tiles = 24
+num_players = 0
+bankruptcy = 0
 
 go_pos = 0
 jail_pos = 6
-tax_pos = {9: 50, 21: 75}
-chance_pos = [3, 15]
 freeParking_pos = 12
 goToJail_pos = 18
+tax_pos = {9: 50, 21: 75}
+chance_pos = [3, 15]
 building_pos = [1, 2, 4, 5, 7, 8, 10, 11, 13, 14, 16, 17, 19, 20, 22, 23]
 
 building_info = ["home",
@@ -289,6 +293,7 @@ def tax(player_pos,player_id):
         print(f"Opps, you landed on {tax_name} and lost {val} sanity.")
         players[player_id].update_sanity(-val)
     pass
+
     
 def chance(player_id):
     
