@@ -128,81 +128,75 @@ widg = tkinter.Canvas(top, bg = "black", height = boardDimensionY, width = board
 # Defining classes of objects
 #-------------------------------------------------------------------------#
 class player():
-    id_no = 0
     
     def __init__(self, name: str):
-        self.__id = self.id_no
-        self.__status = "Normal"
-        self.__position = 0
-        self.__name = name
-        self.__sanity = 200
-        self.__building = []
-        self.__jail = 0
-
-        self.id_no += 1
+        self.name = name
+        self._status = "Normal"
+        self._position = 0
+        self._sanity = 200
+        self._jail = 0
       
     def get_status(self) -> str:
-        return self.__status
+        return self._status
     
     def update_status(self,status: str):
         #Normal, Bankrupt, Jailed, Frozen
-        self.__status = status
+        self._status = status
         
         if status == "Bankrupt":
             global bankruptcy
             bankruptcy += 1
         
         if status == "Jail":
-            self.__jail = 3
+            self._jail = 3
             pass
     
     def get_position(self) -> int:
-        return self.__position
+        return self._position
     
     def update_position(self, position: int):
-        self.__position += position
-        self.__position = self.__position % num_of_tiles
+        self._position += position
+        self._position = self._position % num_of_tiles
     
     def teleport(self,position: int):
-        self.__position = position
+        self._position = position
     
     def get_name(self) -> str:
-        return self.__name
+        return self.name
     
     def get_sanity(self) -> int:
-        return self.__sanity
+        return self._sanity
     
     def update_sanity(self, sanity: int):
-        self.__sanity += sanity
+        self._sanity += sanity
     
     def get_jailCount(self) -> int:
-        return self.__jail
+        return self._jail
     
     def update_jailCount(self):
-        self.__jail -= 1
+        self._jail -= 1
         
-        if self.__jail == 0:
-            self.__status = "Normal"
+        if self._jail == 0:
+            self._status = "Normal"
     
 class building():
 
     def __init__(self, name: str, truncated: str, cost: list):
-        
-        self.__level = 0
-        self.__owner = None
+        self._level = 0
+        self._owner = None
         self.__cost = cost
         self.__name = name
         self.__truncated = truncated
     
     def get_rent(self) -> int:
         # rent of building calculated from cost and level 
-        return self.__cost[self.__level]*1.5
+        return self.__cost[self._level]*1.5
 
     def level_up(self):
-        self.__level +=1
+        self._level +=1
     
     def set_ownership(self, player_id: int):
-        self.__owner = player_id
+        self._owner = player_id
 
     def get_name(self) -> str:
         return self.__name
@@ -214,25 +208,21 @@ class building():
         cost = 0
         
         if len(level) == 0:
-            for i in range(self.__level + 1):
+            for i in range(self._level + 1):
                 cost += self.__cost[i]
             return cost
         else:
             return self.__cost[level[0]]
         
     def get_owner(self) -> int:
-        return self.__owner
+        return self._owner
     
     def get_level(self) -> int:
-        return self.__level
+        return self._level
         
 class tile():
-    id_no = 0
     
     def __init__(self, tile_type: str, *building: object):
-        self.__id = self.id_no
-        self.id_no += 1
-        
         self.__tile_type = tile_type
         
         if self.__tile_type == "building":
@@ -245,15 +235,10 @@ class tile():
         return self.__building
 
 class card():
-    id_no = 0
     
     def __init__(self, name: str, effect: str, *cost: int):
-        self.__id = self.id_no
-        self.__name = name
-        
+        self.__name = name    
         self.__effect = effect, *cost
-
-        self.id_no += 1
     
     def get_name(self) -> str:
         return self.__name
