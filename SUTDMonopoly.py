@@ -638,6 +638,9 @@ def gameround(player_id):
         
         update_board(player_id, dice1, dice2)
         
+        if (player.get_status() == "Jail"):
+            return
+        
     pass
 
 # Initialize variables and players
