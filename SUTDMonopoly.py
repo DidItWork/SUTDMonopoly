@@ -134,13 +134,13 @@ class player():
         self._status = "Normal"
         self._position = 0
         self._sanity = 200
-        self._jail = 0
+        self._jail_count = 0
       
     def get_status(self) -> str:
         return self._status
     
     def update_status(self,status: str):
-        #Normal, Bankrupt, Jailed, Frozen
+        #Normal, Bankrupt, Jailed
         self._status = status
         
         if status == "Bankrupt":
@@ -148,7 +148,7 @@ class player():
             bankruptcy += 1
         
         if status == "Jail":
-            self._jail = 3
+            self._jail_count = 3
             pass
     
     def get_position(self) -> int:
@@ -171,12 +171,12 @@ class player():
         self._sanity += sanity
     
     def get_jailCount(self) -> int:
-        return self._jail
+        return self._jail_count
     
     def update_jailCount(self):
-        self._jail -= 1
+        self._jail_count -= 1
         
-        if self._jail == 0:
+        if self._jail_count == 0:
             self._status = "Normal"
     
 class building():
