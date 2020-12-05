@@ -191,18 +191,6 @@ class building():
     def get_rent(self) -> int:
         # rent of building calculated from cost and level 
         return self.__cost[self._level]*1.5
-
-    def level_up(self):
-        self._level +=1
-    
-    def set_ownership(self, player_id: int):
-        self._owner = player_id
-
-    def get_name(self) -> str:
-        return self.__name
-
-    def get_truncated(self) -> str:
-        return self.__truncated
     
     def get_cost(self, *level: int) -> int:
         cost = 0
@@ -213,6 +201,18 @@ class building():
             return cost
         else:
             return self.__cost[level[0]]
+        
+    def set_ownership(self, player_id: int):
+        self._owner = player_id
+
+    def level_up(self):
+        self._level +=1
+
+    def get_name(self) -> str:
+        return self.__name
+
+    def get_truncated(self) -> str:
+        return self.__truncated
         
     def get_owner(self) -> int:
         return self._owner
@@ -243,7 +243,7 @@ class card():
     def get_name(self) -> str:
         return self.__name
     
-    def get_effect(self) -> str:
+    def get_effect(self) -> tuple:
         return self.__effect
     
 # Game functions
