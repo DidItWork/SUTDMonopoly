@@ -1,13 +1,7 @@
-# Title
-<h1>
-  SUTDMonopoly
-</h1>
-  
-CDT 1D Project
-Cohort 11
-Group 7
+# SUTDMonopoly
 
-Name: SUTDMonopoly
+> CDT 1D Project
+> Cohort 11 Group 7
 
 Description:
 This is a text-based game based on the board game "monopoly". As with Monopoly, players are eliminated when they run out of the currency, "Sanity". 
