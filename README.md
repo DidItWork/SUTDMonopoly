@@ -2,27 +2,39 @@
 
 ## Introduction
 
-**SUTDMonopoly** is a multiplayer text-based game based on the board game "Monopoly". In this variant, the names of property, currency, and cards have been renamed to be SUTD related. The rules in this variant are similar to "Monopoly". As with Monopoly, players will roll **2** dices to move their pieces around the board from the Start, or "Go" tile. Upon landing on different tile sets, there will be different events for the user. The layout of the tile set will be of a 7x7 grid. This game has to be played between 2 and 5 players.
+**SUTDMonopoly** is a multiplayer text-based game based on the board game "Monopoly". It operates on two windows — one for display, and another for taking user inputs. We adopted and modified most of the original game features (<find citation later>) and incorporated characteristics that are unique to SUTD. 
+
+The rules in this variant are similar to "Monopoly". As with Monopoly, this game is meant to be a multiplayer game played between 2 to 5 players. For each turn, the players will roll **2** dices to move their pieces around the board. Upon landing on different tile sets, there will be different events for the users. The objective of the game still holds, which is to force opponents into bankruptcy by buying and upgrading their properties. 
+
+### Rules
+
+Each player will start with an initial amount of 200 sanity. Two dices will be thrown and their pieces will be moved anti-clockwise around the board from the "Home" tile according to the sum of the dice thrown. By throwing a double, the player will be entitled to throw again. A maximum of 3 doubles are allowed to balance out any RNGs. Every time player passes “Home”, he/she will receive an additional 150 sanity.
+
+Upon landing on an unclaimed property tile, they can choose to purchase the property for a predetermined amount of "Sanity". Any subsequent players landing on this tile will have to transfer a predetermined amount of "Sanity" to the owner of the tile. In the case when the owner lands on his own property, he would be allowed to upgrade the building up to a level of 3.
+ 
+Upon landing on a chance tile, the player will automatically draw a chance card that will have random positive or negative effects. Upon landing on a "Tax" tile, the player would be required to pay the stipulated tax associated to it. Landing on the "Go To Jail" tile will cause the player to be jailed for his next 3 turns.
+
+The "Jail" and "Free Parking" tile has no effect other than printing a text.
+
+The game ends when all other players, except the winner, turns “crazy for studying too hard’, i.e., lost all their ‘Sanity’
 
 ### Properties
 
-Upon landing on an unclaimed property tile, the player can choose to purchase the property for a predetermined amount of "Sanity". Any subsequent players landing on this tile will have to transfer a predetermined amount of "Sanity" to the owner of the tile.
+In the original Monopoly, most of the properties are classified into sets of 3. Ownership of properties from the same set would automatically increase its base rent. 
 
-In the case when the owner lands on his own property, he would be allowed to upgrade the building up to a level of 3.
+However, due to board space constraints, we modified all the properties to be in sets of 2. For the sake of simplicity and gameplay, ownership of properties from the same set would not automatically increase its base rent. 
 
 ### Chance
 
-Upon landing on the chance tile, the game will draw a card from the current deck that will have random effects ranging from gaining currency, losing currency, and jail. The drawn chance card will not be repeated until the deck is fully depleted, and then it will be reshuffled.
+In this variant of Monoply, there will be a total of 20 chance cards, with 4 primary effects such as gaining "sanity", "losing "sanity", going to jail, and losing a property. The chance cards will be drawn by deck and will not be repeated until the deck is fully depleted, which then, it will be reshuffled.
 
-### Tax and Jail
+### Jail
 
-Upon landing on the "Tax" Tile, the player would be required to pay the stipulated tax associated to it. 
-
-Jail time has been set at 3 turns and players are allowed to roll a double to break out of jail.
+If jailed, the player will be jailed for his next 3 turns. A player would also have the chance to break out of jail early if he manages to roll a double during his turn.
 
 ### Winning condition
 
-As with Monopoly, pLayers are allowed to sell their properties to stay "Alive" and continue playing the game. However, the players are eliminated when they run out of currency, "Sanity" and properties to sell. The game will carry on until there is only one player left, and the winner of the game will be announced.
+As with Monopoly, pLayers are allowed to sell their properties to stay "Alive" and continue playing the game. However, the players are eliminated when they run out of currency, "Sanity" and properties to sell. The game ends when all other players, except the winner, turns “crazy for studying too hard’, i.e., lost all their ‘Sanity’. The winner will be announced in text and the terminal exits after entering 'end'.
 
 ### Dependencies:
 
