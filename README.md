@@ -62,23 +62,25 @@ As with Monopoly, pLayers are allowed to sell their properties to stay "Alive" a
 
 
 ### UI Functions
-These functions help translate the information in the program to visual informaation in the Tk() window
+These functions help translate the information in the program to visual information in the Tk() window
 
 #### avg( CoordLs: [x1,y1,x2,y2], xy: str)
 > Finds the average of x or y coordinates of two extreme corners of a rectangle in the User Interface (UI) dpending on the value of xy
-#### Parameters:
+**Parameters**:
 * **CoordLs**— a list of values corresponding to the coordinates of the top left corner (x1, y1) and bottom right corner (x2, y2) of a rectangle in the UI
 * **xy**— a string containing 'x' or 'y'
+
 **Returns:** The mean of x1 and x2, or y1 and y2, depending on whether the value **xy** passed was 'x' or 'y' respectively
 
 #### getProperties(coord: [x1,y1,x2,y2], ori: int or str, thisId: int)
 >  Returns several key coordinates and rotation angles for the components of the tile with the coordinates represented in **coord**
-#### Parameters:
+**Parameters**:
 * **coord**— a list of values corresponding to the coordinates of the top left corner (x1, y1) and bottom right corner (x2, y2) of a rectangle in the UI representing a tile on the board
 * **ori**— an index corresponding to the rotation of the tile, or a string to indicate that it is a corner
 * **thisId**— the integer ID of the rectangle assigned by the tkinter.Canvas() object
+
 **Returns:** A tuple with contents: (thisId, smolBox, centre, bottom, namePos, ownerPos, textRot)
-* **thisID**— the integer ID of the rectangle assigned by the tkinter.Canvas() object
+* **thisId**— the integer ID of the rectangle assigned by the tkinter.Canvas() object
 * **smolbox**— a list of values corresponding to the coordinates of the top left corner (x1, y1) and bottom right corner (x2, y2) of the small coloured rectangle located at the top of the tile for rectangluar tiles, and those of a square occupying the top right corner of the tile for corner tiles
 * **centre**— a list containing the x and y value of the centre of the tile
 * **namePos**— a list containing the x and y value to which the text object displaying "chance" or property name will be anchored to on a rectangular tile
@@ -89,7 +91,8 @@ These functions help translate the information in the program to visual informaa
 > Changes the state of the seven pips in one of the displayed dice on the UI to display the number rolled by the player. tkinter.DISABLED disables the pip, turning it black, while tkinter.NORMAL causes the pip to turn white. 
 **Parameters**:
 * **roll**— the number rolled by the player
-* **pips**— a list containing all the IDs assigned to each oval object in the tkinter.Canvas() object representing a pip
+* **pips**— a list containing all the IDs assigned to each oval object in the tkinter.Canvas() object representing a pip 
+
 **Returns:** None
 
 Special thanks to Tim for not sleeping and CS for raging during debugging.
