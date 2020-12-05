@@ -31,7 +31,7 @@ As with Monopoly, pLayers are allowed to sell their properties to stay "Alive" a
 
 ## How to play
 
-1. Ensure that your python is of at least version 3.7 for tkinter to work.
+1. Ensure that your python is of at least version 3.8 for tkinter to work.
 
 2. Open power shell (Win X + A) or any of your favorite terminal or Anaconda Prompt.
 
