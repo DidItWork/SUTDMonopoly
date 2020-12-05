@@ -1,6 +1,6 @@
 <h1>
   SUTDMonopoly
-<\h1>
+</h1>
   
 CDT 1D Project
 Cohort 11
