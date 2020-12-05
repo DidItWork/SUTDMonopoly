@@ -633,11 +633,13 @@ def gameround(player_id):
             print("Free parking, take a break!")
         elif tiles[player_pos].get_type() == "goToJail":
             jail(player_id)
-            return
         else:
             print("Some error occurred.")
         
         update_board(player_id, dice1, dice2)
+        
+        if (player.get_status() == "Jail"):
+            return
         
     pass
 
