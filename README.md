@@ -90,11 +90,24 @@ These functions help translate the information in the program to visual informat
 * **textRot**— the angle (in degrees) at which the text objects should be rotated
 
 #### setDice(roll: int, pips: list())
-> Changes the state of the seven pips in one of the displayed dice on the UI to display the number rolled by the player. tkinter.DISABLED disables the pip, turning it black, while tkinter.NORMAL causes the pip to turn white. 
+> Changes the state of the seven pips (tkinter.canvas oval objects) in one of the displayed dice on the UI to display the number rolled by the player. Setting the oval object's state to tkinter.DISABLED turns it black, causing it to "disappear" against the black background, while setting the object's state to tkinter.NORMAL causes it to turn white. 
 
 **Parameters**:
 * **roll**— the number rolled by the player
 * **pips**— a list containing all the IDs assigned to each oval object in the tkinter.Canvas() object representing a pip 
+
+**Returns:** None
+
+#### initUI()
+> Initialises the UI. Instantiates the canvas, tiles, dice, player tokens, various text objects and reflects the initial state of the board and player sanity count
+
+**Returns:** None
+
+#### update_UI(\*args)
+> Updates the UI with the latest game information. If supplied with optional parameters, will also update player turn, dice rolls and the name of any property the active player has landed on
+
+**Parameters:**
+* **\*args**— accepts up to 3 arguments, **player_id**, **dice1** and **dice2**, and reflects the updated dice roll, current property tile and current player's turn on the UI respectively
 
 **Returns:** None
 
