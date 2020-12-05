@@ -154,8 +154,8 @@ class player():
     def get_position(self) -> int:
         return self._position
     
-    def update_position(self, position: int):
-        self._position += position
+    def update_position(self, step: int):
+        self._position += step
         self._position = self._position % num_of_tiles
     
     def teleport(self,position: int):
