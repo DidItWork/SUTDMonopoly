@@ -334,6 +334,7 @@ def chance(player_id):
     
     # If "birthday"
     elif cards[chosen].get_effect()[0] == "birthday":
+      
         for i in range(len(players)):
             
             if players[i].get_status == "Bankrupt":
@@ -383,7 +384,7 @@ def chance(player_id):
         lose = 0
         
         for i in building_pos:
-            if tiles[i].get_building().get_owner() == players[player_id]:
+            if tiles[i].get_building().get_owner() == player_id:
                 owned_building.append(i)
                 owned_building.append(tiles[i].get_building().get_name())
                 owned_building.append(tiles[i].get_building().get_cost())
