@@ -42,9 +42,9 @@ As with Monopoly, pLayers are allowed to sell their properties to stay "Alive" a
    $ python ./SUTDMonopoly.py
    ```
    
-3. Upon launching the game, set the terminal to be on the right side of your screen and the tkinter window to be on the right side of the screen. The game should look somethign like this
+3. Upon launching the game, set the terminal to be on the right side of your screen and the tkinter window to be on the right side of the screen. The game should look something like this
 
-<insert image>
+![Example](url)
    
 ## Documentation
 
