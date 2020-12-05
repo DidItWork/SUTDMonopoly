@@ -62,10 +62,11 @@ As with Monopoly, pLayers are allowed to sell their properties to stay "Alive" a
 
 
 ### UI Functions
-These functions help translate the information in the program to visual information in the Tk() window
+These functions help translate the information in the program to visual information in the Tk() window.
 
 #### avg( CoordLs: [x1,y1,x2,y2], xy: str)
 > Finds the average of x or y coordinates of two extreme corners of a rectangle in the User Interface (UI) dpending on the value of xy
+
 **Parameters**:
 * **CoordLs**— a list of values corresponding to the coordinates of the top left corner (x1, y1) and bottom right corner (x2, y2) of a rectangle in the UI
 * **xy**— a string containing 'x' or 'y'
@@ -74,6 +75,7 @@ These functions help translate the information in the program to visual informat
 
 #### getProperties(coord: [x1,y1,x2,y2], ori: int or str, thisId: int)
 >  Returns several key coordinates and rotation angles for the components of the tile with the coordinates represented in **coord**
+
 **Parameters**:
 * **coord**— a list of values corresponding to the coordinates of the top left corner (x1, y1) and bottom right corner (x2, y2) of a rectangle in the UI representing a tile on the board
 * **ori**— an index corresponding to the rotation of the tile, or a string to indicate that it is a corner
@@ -89,6 +91,7 @@ These functions help translate the information in the program to visual informat
 
 #### setDice(roll: int, pips: list())
 > Changes the state of the seven pips in one of the displayed dice on the UI to display the number rolled by the player. tkinter.DISABLED disables the pip, turning it black, while tkinter.NORMAL causes the pip to turn white. 
+
 **Parameters**:
 * **roll**— the number rolled by the player
 * **pips**— a list containing all the IDs assigned to each oval object in the tkinter.Canvas() object representing a pip 
