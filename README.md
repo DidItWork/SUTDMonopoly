@@ -60,9 +60,10 @@ As with Monopoly, pLayers are allowed to sell their properties to stay "Alive" a
    
 ## Documentation
 
+### 
 
 ### UI Functions
-These functions help translate the information in the program to visual information in the Tk() window.
+These functions help translate the game data in the program to graphics in the Tk() window.
 
 #### avg( CoordLs: [x1,y1,x2,y2], xy: str)
 > Finds the average of x or y coordinates of two extreme corners of a rectangle in the User Interface (UI) dpending on the value of xy
@@ -107,7 +108,7 @@ These functions help translate the information in the program to visual informat
 > Updates the UI with the latest game information. If supplied with optional parameters, will also update player turn, dice rolls and the name of any property the active player has landed on
 
 **Parameters:**
-* **\*args**— accepts up to 3 arguments, **player_id**, **dice1** and **dice2**, and reflects the updated dice roll, current property tile and current player's turn on the UI respectively
+* **\*args**— accepts up to 3 arguments, **player_id**, **dice1** and **dice2**, and reflects the current property tile and current player's turn on the UI, and updated dice roll,  respectively
 
 **Returns:** None
 
