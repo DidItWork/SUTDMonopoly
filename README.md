@@ -56,7 +56,7 @@ As with Monopoly, pLayers are allowed to sell their properties to stay "Alive" a
    
 3. Upon launching the game, set the terminal to be on the right side of your screen and the tkinter window to be on the right side of the screen. The game should look something like this
 
-![Example](https://imgur.com/a/mO9xhUw)
+![Example](gameplay.png)
    
 ## Documentation
 
