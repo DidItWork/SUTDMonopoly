@@ -127,7 +127,7 @@ widg = tkinter.Canvas(top, bg = "black", height = boardDimensionY, width = board
 
 # Defining classes of objects
 #-------------------------------------------------------------------------#
-class player():
+class player:
     
     def __init__(self, name: str):
         self.name = name
@@ -179,7 +179,7 @@ class player():
         if self._jail_count == 0:
             self._status = "Normal"
     
-class building():
+class building:
 
     def __init__(self, name: str, truncated: str, cost: list):
         self._level = 0
@@ -220,7 +220,7 @@ class building():
     def get_level(self) -> int:
         return self._level
         
-class tile():
+class tile:
     
     def __init__(self, tile_type: str, *building: object):
         self.__tile_type = tile_type
@@ -234,7 +234,7 @@ class tile():
     def get_building(self) -> object:
         return self.__building
 
-class card():
+class card:
     
     def __init__(self, name: str, effect: str, *cost: int):
         self.__name = name    
