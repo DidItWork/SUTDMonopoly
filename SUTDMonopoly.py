@@ -1013,5 +1013,6 @@ def setDice(roll: int, pips: list):
             widg.itemconfigure(pips[pip], state = tkinter.NORMAL)
         else:
             widg.itemconfigure(pips[pip], state = tkinter.DISABLED)
+#sup
 #Run the game
 game()
