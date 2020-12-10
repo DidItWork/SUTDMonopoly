@@ -4,7 +4,7 @@ Created on Mon Nov 16 17:54:30 2020
 
 @author: Benjamin Luo, chuanshaof, Timothy, Wang Zhao
 """
-#hgj
+
 import tkinter
 import random
 
@@ -854,7 +854,7 @@ def initUI():
         widg.create_rectangle(dice[i], outline = "white")
         if i == 0:
             pips = pips1
-    #Hey
+
         else:
             pips = pips2
         for r in range(3):
@@ -1013,5 +1013,7 @@ def setDice(roll: int, pips: list):
             widg.itemconfigure(pips[pip], state = tkinter.NORMAL)
         else:
             widg.itemconfigure(pips[pip], state = tkinter.DISABLED)
+            
+# timonerhy asf
 #Run the game
 game()
