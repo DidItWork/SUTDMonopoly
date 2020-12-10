@@ -854,7 +854,7 @@ def initUI():
         widg.create_rectangle(dice[i], outline = "white")
         if i == 0:
             pips = pips1
-    #Hey
+
         else:
             pips = pips2
         for r in range(3):
@@ -1013,6 +1013,8 @@ def setDice(roll: int, pips: list):
             widg.itemconfigure(pips[pip], state = tkinter.NORMAL)
         else:
             widg.itemconfigure(pips[pip], state = tkinter.DISABLED)
-#sup
+            
+# timonerhy asf
+
 #Run the game
 game()
