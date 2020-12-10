@@ -4,7 +4,7 @@ Created on Mon Nov 16 17:54:30 2020
 
 @author: Benjamin Luo, chuanshaof, Timothy, Wang Zhao
 """
-#hgj
+
 import tkinter
 import random
 
