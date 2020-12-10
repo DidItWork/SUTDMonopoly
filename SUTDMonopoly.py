@@ -854,6 +854,7 @@ def initUI():
         widg.create_rectangle(dice[i], outline = "white")
         if i == 0:
             pips = pips1
+    #Hey
         else:
             pips = pips2
         for r in range(3):
