@@ -1015,5 +1015,6 @@ def setDice(roll: int, pips: list):
             widg.itemconfigure(pips[pip], state = tkinter.DISABLED)
             
 # timonerhy asf
+
 #Run the game
 game()
