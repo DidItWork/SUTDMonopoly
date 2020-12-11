@@ -127,143 +127,128 @@ widg = tkinter.Canvas(top, bg = "black", height = boardDimensionY, width = board
 
 # Defining classes of objects
 #-------------------------------------------------------------------------#
-class player():
-    id_no = 0
+class player:
     
-    def __init__(self, name):
-        self.__id = self.id_no
-        self.__status = "Normal"
-        self.__position = 0
-        self.__name = name
-        self.__sanity = 200
-        self.__building = []
-        self.__jail = 0
-
-        self.id_no += 1
+    def __init__(self, name: str):
+        self.name = name
+        self._status = "Normal"
+        self._position = 0
+        self._sanity = 200
+        self._jail_count = 0
       
-    def get_status(self):
-        return self.__status
+    def get_status(self) -> str:
+        return self._status
     
-    def update_status(self,status):
-        #Normal, Bankrupt, Jailed, Frozen
-        self.__status = status
+    def update_status(self,status: str):
+        #Normal, Bankrupt, Jailed
+        self._status = status
         
         if status == "Bankrupt":
             global bankruptcy
             bankruptcy += 1
         
         if status == "Jail":
-            self.__jail = 3
+            self._jail_count = 3
             pass
     
-    def get_position(self):
-        return self.__position
+    def get_position(self) -> int:
+        return self._position
     
-    def update_position(self, position):
-        self.__position += position
-        self.__position = self.__position % num_of_tiles
+    def update_position(self, step: int):
+        self._position += step
+        self._position = self._position % num_of_tiles
     
-    def teleport(self,position):
-        self.__position = position
+    def teleport(self,position: int):
+        self._position = position
     
-    def get_name(self):
-        return self.__name
+    def get_name(self) -> str:
+        return self.name
     
-    def get_sanity(self):
-        return self.__sanity
+    def get_sanity(self) -> int:
+        return self._sanity
     
-    def update_sanity(self, sanity):
-        self.__sanity += sanity
+    def update_sanity(self, sanity: int):
+        self._sanity += sanity
     
-    def get_jailCount(self):
-        return self.__jail
+    def get_jailCount(self) -> int:
+        return self._jail_count
     
     def update_jailCount(self):
-        self.__jail -= 1
+        self._jail_count -= 1
         
-        if self.__jail == 0:
-            self.__status = "Normal"
+        if self._jail_count == 0:
+            self._status = "Normal"
     
-class building():
+class building:
 
-    def __init__(self, name, truncated, cost):
-        
-        self.__level = 0
-        self.__owner = None
+    def __init__(self, name: str, truncated: str, cost: list):
+        self._level = 0
+        self._owner = None
         self.__cost = cost
         self.__name = name
         self.__truncated = truncated
     
-    def get_rent(self):
+    def get_rent(self) -> int:
         # rent of building calculated from cost and level 
-        return self.__cost[self.__level]*1.5
-
-    def level_up(self):
-        self.__level +=1
+        return self.__cost[self._level]*1.5
     
-    def set_ownership(self, player_id):
-        self.__owner = player_id
-
-    def get_name(self):
-        return self.__name
-
-    def get_truncated(self):
-        return self.__truncated
-    
-    def get_cost(self, *level):
+    def get_cost(self, *level: int) -> int:
         cost = 0
         
         if len(level) == 0:
-            for i in range(self.__level + 1):
+            for i in range(self._level + 1):
                 cost += self.__cost[i]
             return cost
         else:
             return self.__cost[level[0]]
         
-    def get_owner(self):
-        return self.__owner
-    
-    def get_level(self):
-        return self.__level
+    def set_ownership(self, player_id: int):
+        self._owner = player_id
+
+    def level_up(self):
+        self._level +=1
+
+    def get_name(self) -> str:
+        return self.__name
+
+    def get_truncated(self) -> str:
+        return self.__truncated
         
-class tile():
-    id_no = 0
+    def get_owner(self) -> int:
+        return self._owner
     
-    def __init__(self, tile_type, *building):
-        self.__id = self.id_no
-        self.id_no += 1
+    def get_level(self) -> int:
+        return self._level
         
+class tile:
+    
+    def __init__(self, tile_type: str, *building: object):
         self.__tile_type = tile_type
         
         if self.__tile_type == "building":
             self.__building = building[0]
     
-    def get_type(self):
+    def get_type(self) -> str:
         return self.__tile_type
     
-    def get_building(self):
+    def get_building(self) -> object:
         return self.__building
 
-class card():
-    id_no = 0
+class card:
     
-    def __init__(self, name, effect, *cost):
-        self.__id = self.id_no
-        self.__name = name
-        
+    def __init__(self, name: str, effect: str, *cost: int):
+        self.__name = name    
         self.__effect = effect, *cost
-
-        self.id_no += 1
     
-    def get_name(self):
+    def get_name(self) -> str:
         return self.__name
     
-    def get_effect(self):
+    def get_effect(self) -> tuple:
         return self.__effect
     
 # Game functions
 #-------------------------------------------------------------------------#
-def roll():
+def roll() -> tuple:
     #return a tuple of two integers (1-6) from dice rolls
     dice1 = random.randint(1, 6)
     dice2 = random.randint(1, 6)
@@ -273,18 +258,18 @@ def roll():
     
     return dice1, dice2
 
-def home(player_id):
+def home(player_id: int):
     print(f"{go_name}, regain {pass_go} sanity!")
     players[player_id].update_sanity(pass_go)
     pass
 
-def jail(player_id):
+def jail(player_id: int):
     print("You landed in jail!")
     players[player_id].update_status("Jail")
     players[player_id].teleport(jail_pos)
     pass
 
-def tax(player_pos,player_id):
+def tax(player_pos: int, player_id: int):
     val = tax_pos[player_pos]
     
     if players[player_id].get_sanity() < val:
@@ -295,7 +280,7 @@ def tax(player_pos,player_id):
     pass
 
     
-def chance(player_id):
+def chance(player_id: int):
     
     global carded
     
@@ -414,7 +399,7 @@ def chance(player_id):
             print("Your have lost ownership of", lose_building[lose - 1][1])
         pass
     
-def pay_rent(from_player, to_player, amount):
+def pay_rent(from_player: int, to_player: int, amount: int) -> None:
     print("\nRent time!")
     print(f"Pay {amount} sanity to {names[to_player]}.")
     
@@ -434,7 +419,7 @@ def pay_rent(from_player, to_player, amount):
     bankrupt(amount, from_player, to_player)
     pass
 
-def upgrade_building(active_building, player):
+def upgrade_building(active_building: object, player: object):
         
     print(active_building.get_cost(active_building.get_level() + 1))
     print(player.get_sanity())
@@ -451,9 +436,10 @@ def upgrade_building(active_building, player):
     if buy[0] in "yY":
         player.update_sanity(-active_building.get_cost(active_building.get_level() + 1))
         active_building.level_up()
+        print(f"{active_building.get_name()} has been upgraded to level {active_building.get_level()}")    
     pass
 
-def buy_building(player, player_id, active_building):
+def buy_building(player: object, player_id: int, active_building: object):
     buy = "z"
     while buy[0] not in "yYnN":
         buy = input(("Do you want to buy %s, cost: %s sanity [y/n]? " % (active_building.get_name(), active_building.get_cost())))
@@ -463,11 +449,10 @@ def buy_building(player, player_id, active_building):
     if buy[0] in "yY":
         active_building.set_ownership(player_id)
         player.update_sanity(-active_building.get_cost())
-        print(f"{active_building.get_name()} is now owned by: {names[active_building.get_owner()]}")
-        return
+        print(f"{active_building.get_name()} is now owned by: {names[active_building.get_owner()]}")    
     pass
 
-def bankrupt(amount, from_player, to_player):
+def bankrupt(amount: int, from_player: int, to_player: int) -> None:
     print(f"{names[from_player]} is out of sanity!")
     
     # Initialize some local variables for later
@@ -537,7 +522,7 @@ def bankrupt(amount, from_player, to_player):
                 return
     pass
 
-def jail_turn(player_id):
+def jail_turn(player_id: int):
     if players[player_id].get_jailCount() > 1:
         input("Roll a double to break out of jail! Press 'Enter' to roll.")
         dice1, dice2 = roll()
@@ -554,7 +539,7 @@ def jail_turn(player_id):
 
 # Gameround
 #-------------------------------------------------------------------------#
-def gameround(player_id):
+def gameround(player_id: int) -> None:
     dice1 = None
     dice2 = None
     step = 0
@@ -637,6 +622,9 @@ def gameround(player_id):
             print("Some error occurred.")
         
         update_board(player_id, dice1, dice2)
+        
+        if (player.get_status() == "Jail"):
+            return
         
     pass
 
@@ -749,6 +737,7 @@ def render_game():
     carded = list(range(len(cards)))
     
     initUI()
+    pass
     
 # GUI/Board functions
 #-------------------------------------------------------------------------#
@@ -865,6 +854,7 @@ def initUI():
         widg.create_rectangle(dice[i], outline = "white")
         if i == 0:
             pips = pips1
+
         else:
             pips = pips2
         for r in range(3):
@@ -978,7 +968,7 @@ def update_board(*args):
     return
     pass
 
-def avg(coordLs, xy):
+def avg(coordLs: list, xy: str):
     if xy == "x":
         mean = (coordLs[0]+coordLs[2])/2
     elif xy == 'y':
@@ -987,12 +977,12 @@ def avg(coordLs, xy):
         return None
     return mean
 
-def makeToken(startPos, colour):
+def makeToken(startPos: list, colour: str):
     coords = [startPos[0]+10, startPos[1]+10, startPos[0]-10, startPos[1]-10]
     token = widg.create_rectangle(coords, fill=colour, outline = colour)
     return token    
 
-def getProperties(coord, ori, thisId):
+def getProperties(coord: list, ori: int, thisId: object):
     
     centre = [avg(coord, 'x'), avg(coord, 'y')]
     smolBox = coord.copy()
@@ -1016,12 +1006,13 @@ def getProperties(coord, ori, thisId):
         ownerPos = None
     return (thisId, smolBox, centre, bottom, namePos, ownerPos, textRot) 
 
-def setDice(roll, pips):
+def setDice(roll: int, pips: list):
     dMap = diceMaps[roll-1]
     for pip in range(len(dMap)):
         if dMap[pip] == 1:
             widg.itemconfigure(pips[pip], state = tkinter.NORMAL)
         else:
             widg.itemconfigure(pips[pip], state = tkinter.DISABLED)
+
 #Run the game
 game()
