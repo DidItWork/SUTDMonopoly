@@ -20,9 +20,7 @@ The game ends when all other players, except the winner, turns “crazy for stud
 
 ### Properties
 
-In the original Monopoly, most of the properties are classified into sets of 3. Ownership of properties from the same set would automatically increase its base rent. 
-
-However, due to board space constraints, we modified all the properties to be in sets of 2. For the sake of simplicity and gameplay, ownership of properties from the same set would not automatically increase its base rent. There are a total of 16 buildings scattered around the board. Each property has three levels and landing on a property you own will allow you to upgrade it should you have enough sanity. The sanity that players who land on your property have to pay will be a function of the level of your building and your building’s sanity cost with which you have upgraded it.
+In this variant of Monopoly, properties are coded to be in sets of 2. For the sake of simplicity and gameplay, ownership of properties from the same set would not automatically increase its base rent. There are a total of 16 buildings scattered around the board. Each property has three levels and landing on a property you own will allow you to upgrade it should you have enough sanity. The sanity that players who land on your property have to pay will be a function of the level of your building and your building’s sanity cost with which you have upgraded it.
 
 ### Mortgage
 
@@ -70,7 +68,13 @@ As with Monopoly, players are allowed to sell their properties to stay "Alive" a
    
 ## Documentation
 
-### 
+### class player( name:str )
+
+Player class to keep track of each players in the game.
+
+#### Parameters:
+
+**Parameters**
 
 ### UI Functions
 These functions help translate the game data in the program to graphics in the Tk() window.
