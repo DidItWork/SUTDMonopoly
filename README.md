@@ -68,13 +68,137 @@ As with Monopoly, players are allowed to sell their properties to stay "Alive" a
    
 ## Documentation
 
-### class player( name:str )
-
+### class player(name: str)
 Player class to keep track of each players in the game.
 
-#### Parameters:
+**Properties:**
 
-**Parameters**
+- **name** – Player's name in string.
+- **status** – Player's status in string, defaulted at "Normal".
+- **position** – Player's position in integer.
+- **sanity** – Player's sanity in integer, defaulted at 200.
+- **jail_count** – Player's jail_count in integer.
+
+### teleport(position: int)
+> Changes the player position to the stipulated input.
+
+### update_jailCount()
+> Reduces player's jail_count until reaches 0, and changes player's status back to "Normal".
+
+### update_position(step: int)
+> Modifies the player's position attribute and modulus to keep within scale of num_of_tiles.
+
+
+
+### class building(name: str, truncated: str, cost: list(int, int, int))
+Building class to keep track of each building in the game.
+
+**Properties:**
+
+- **level** – Building's level in integer, defaulted at 0.
+- **owner** – Building's owner in integer, defaulted at None.
+- **cost** – List of length 3 of Building's costs.
+- **name** – Building's name in string.
+- **truncated** – Building's truncated/shortened name in string.
+
+### get_rent()
+> Returns an integer, that is 1.5x of the building's current level's cost.
+
+### get_cost()
+> Returns an integer, that is the summation of all the building costs up till the building's current level.
+
+
+
+### class tile(tile_type: str, building: object)
+Tile class to keep track of each tile in the game.
+
+**Properties:**
+
+- **tile_type** – Tile's type_type in string.
+- **building** – Building object associated with the tile.
+
+
+
+### class card(name: str, effect: str, cost: int)
+Card class to keep track of each chance card in the game.
+
+**Properties:**
+
+- **name** – Card's name in string.
+- **effect** – Card's effect and cost in a tuple. 
+
+### Game Functions
+These functions are used for the game logic and to progress the game.
+
+#### roll()
+> Randomizes 2 integers ranging from 1 to 6.
+
+**Returns:** A tuple of the two randomized integers.
+
+#### home(player_id: int)
+> Modifies the player's sanity when the player passes go.
+
+**Returns:** None
+
+#### jail(player_id: int)
+> Teleports the player to jail when necessary.
+
+**Returns:** None
+
+#### tax(player_pos: int, player_id: int)
+> Modifies the player's sanity depending on the tax cost. 
+> Will bankrupt the player if insufficient sanity.
+
+**Returns:** None
+
+#### chance(player_id: int)
+> Randomizes player event depending on the chance card drawn.
+
+**Possible events:**
+1. update_sanity
+2. sanity for all
+3. birthday
+4. go to jail
+5. roll double
+6. lose a property
+
+**Returns:** None
+
+#### pay_rent(from_player: int, to_player: int, amount: int)
+> Transfers player sanity from one player to another
+> Possibility to bankrupt the player and transfer a property instead.
+
+**Returns:** None
+
+#### upgrade_building(active_building: object, player: object)
+> Modifies the active_building object's level attribute depending on user's input.
+
+**Returns:** None
+
+#### buy_building(player: object, player_id: int, active_building: object)
+> Modifies the active_building object's owner attribute depending on user's input.
+
+**Returns:** None
+
+#### bankrupt(amount: int, from_player: int, to_player: int)
+> Gathers from_player list of buildings and transfer to to_player until amount reaches 0
+
+**Returns:** None
+
+#### gameround(player_id: int)
+> Facilitates the current player's actions and calls upon other functions depending on situation.
+
+**Returns:** None
+
+#### game()
+> Facilitates the player's turns and rotate them accordingly to the active players.
+
+**Returns:** None
+
+#### render_game()
+> Initializes the game's information just before the beginning of the game.
+
+**Returns:** None
 
 ### UI Functions
 These functions help translate the game data in the program to graphics in the Tk() window.
